@@ -651,6 +651,95 @@ class ViTTinyMultiSliceClassifier(nn.Module):
             return logits, None
 
 
+class ViTSmallMultiSliceClassifier(nn.Module):
+    """
+    Classifier that processes multiple slices with Vision Transformer Small from HuggingFace.
+    
+    Architecture (IDENTICAL TO ConvNeXt/ResNet50/Swin/ViT-Tiny pipeline):
+    1. Procesa K slices independientemente: (B, K, 3, 224, 224) → flatten → (B*K, 3, 224, 224)
+    2. ViT Small backbone → features: (B*K, 768)
+    3. Reshape: (B, K, 768)
+    4. Attention pooling combines slices → global features: (B, 768)
+    5. Classifier → lesion probability: (B, 1)
+    
+    Supports independent dropout per plane (same as other baselines).
+    
+    ViT Small specs (WinKawaks/vit-small-patch16-224):
+    - ~22M parameters (intermediate between ViT-Tiny ~5.7M and ViT-Base ~86M)
+    - 768-dim feature space (same as ConvNeXt/Swin/ViT-Base)
+    - Pre-trained on ImageNet-1K
+    - Patch-based attention mechanism
+    - Good balance between efficiency and capacity
+    """
+    def __init__(self, num_classes=1, pretrained=True, pooling_mode='attention', 
+                 dropout_input=0.3, dropout_dense=0.2, model_name="WinKawaks/vit-small-patch16-224"):
+        super().__init__()
+        
+        # Load pretrained ViT Small from HuggingFace
+        self.vit = ViTModel.from_pretrained(model_name) if pretrained else ViTModel(ViTModel.config_class())
+        
+        # Feature extraction output dimension for ViT Small:
+        # ViT Small outputs 768-dim features (same as ConvNeXt/Swin/ViT-Base)
+        self.feature_dim = self.vit.config.hidden_size  # 768
+        
+        # Pooling over slices
+        self.pooling_mode = pooling_mode
+        if pooling_mode == 'attention':
+            self.pooling = AttentionPooling(self.feature_dim)
+        elif pooling_mode == 'max':
+            self.pooling = nn.AdaptiveMaxPool1d(1)
+        elif pooling_mode == 'mean':
+            self.pooling = nn.AdaptiveAvgPool1d(1)
+        
+        # Final classifier with configurable dropout per plane
+        # Architecture compatible with other baselines
+        self.classifier = nn.Sequential(
+            nn.Dropout(dropout_input),
+            nn.Linear(self.feature_dim, 256),
+            nn.ReLU(),
+            nn.Dropout(dropout_dense),
+            nn.Linear(256, num_classes)
+        )
+    
+    def forward(self, x):
+        """
+        Args:
+            x: tensor (batch_size, num_slices, 3, 224, 224)
+        Returns:
+            logits: tensor (batch_size, 1)
+            attention_weights: tensor (batch_size, num_slices) if pooling='attention'
+        """
+        batch_size, num_slices, C, H, W = x.shape
+        
+        # Flatten to process all slices at once
+        # (B, K, 3, 224, 224) → (B*K, 3, 224, 224)
+        x = x.view(batch_size * num_slices, C, H, W)
+        
+        # Extract features with ViT Small
+        outputs = self.vit(pixel_values=x)
+        features = outputs.last_hidden_state[:, 0, :]  # Take [CLS] token → (B*K, 768)
+        
+        # Reshape: (B, K, 768)
+        features = features.view(batch_size, num_slices, self.feature_dim)
+        
+        # Apply pooling
+        attention_weights = None
+        if self.pooling_mode == 'attention':
+            pooled_features, attention_weights = self.pooling(features)
+        elif self.pooling_mode == 'max':
+            pooled_features = self.pooling(features.transpose(1, 2)).squeeze(-1)
+        elif self.pooling_mode == 'mean':
+            pooled_features = features.mean(dim=1)
+        
+        # Classify
+        logits = self.classifier(pooled_features)
+        
+        if self.pooling_mode == 'attention':
+            return logits, attention_weights
+        else:
+            return logits, None
+
+
 # ==========================================
 # LOSS FUNCTIONS
 # ==========================================
