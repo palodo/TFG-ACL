@@ -562,6 +562,99 @@ class SwinMultiSliceClassifier(nn.Module):
             return logits, None
 
 
+class SwinBaseMultiSliceClassifier(nn.Module):
+    """
+    Classifier that processes multiple slices with Swin Transformer Base.
+    
+    Architecture (IDENTICAL TO ConvNeXt/ResNet50/Swin Tiny pipeline):
+    1. Procesa K slices independientemente: (B, K, 3, 224, 224) → flatten → (B*K, 3, 224, 224)
+    2. Swin Transformer Base backbone → features: (B*K, 1024)
+    3. Reshape: (B, K, 1024)
+    4. Attention pooling combines slices → global features: (B, 1024)
+    5. Classifier → lesion probability: (B, 1)
+    
+    Supports independent dropout per plane (same as ResNet50/ViT/ConvNeXt baseline).
+    
+    Swin Transformer Base specs:
+    - 87.8M parameters (larger than Tiny 28.3M, better capacity for medical imaging)
+    - 1024-dim feature space (vs 768-dim in Tiny)
+    - Pre-trained on ImageNet-1K
+    - Window-based attention mechanism for efficiency
+    - Better performance on medical imaging compared to Swin Tiny
+    """
+    def __init__(self, num_classes=1, pretrained=True, pooling_mode='attention', 
+                 dropout_input=0.3, dropout_dense=0.2):
+        super().__init__()
+        
+        # Load pretrained Swin Transformer Base via timm
+        model_name = 'swin_base_patch4_window7_224.ms_in1k' if pretrained else 'swin_base_patch4_window7_224'
+        
+        self.backbone = timm.create_model(
+            model_name, 
+            pretrained=pretrained, 
+            num_classes=0  # Remove classification head to get features only
+        )
+        
+        # Feature extraction output dimension for Swin Transformer Base:
+        # Swin Base outputs 1024-dim features (larger than Tiny's 768-dim)
+        self.feature_dim = 1024
+        
+        # Pooling over slices
+        self.pooling_mode = pooling_mode
+        if pooling_mode == 'attention':
+            self.pooling = AttentionPooling(self.feature_dim)
+        elif pooling_mode == 'max':
+            self.pooling = nn.AdaptiveMaxPool1d(1)
+        elif pooling_mode == 'mean':
+            self.pooling = nn.AdaptiveAvgPool1d(1)
+        
+        # Final classifier with configurable dropout per plane
+        self.classifier = nn.Sequential(
+            nn.Dropout(dropout_input),
+            nn.Linear(self.feature_dim, 256),
+            nn.ReLU(),
+            nn.Dropout(dropout_dense),
+            nn.Linear(256, num_classes)
+        )
+    
+    def forward(self, x):
+        """
+        Args:
+            x: tensor (batch_size, num_slices, 3, 224, 224)
+        Returns:
+            logits: tensor (batch_size, 1)
+            attention_weights: tensor (batch_size, num_slices) if pooling='attention'
+        """
+        batch_size, num_slices, C, H, W = x.shape
+        
+        # Flatten to process all slices at once
+        # (B, K, 3, 224, 224) → (B*K, 3, 224, 224)
+        x = x.view(batch_size * num_slices, C, H, W)
+        
+        # Extract features with Swin Transformer Base
+        features = self.backbone(x)  # (B*K, 1024)
+        
+        # Reshape: (B, K, 1024)
+        features = features.view(batch_size, num_slices, self.feature_dim)
+        
+        # Apply pooling
+        attention_weights = None
+        if self.pooling_mode == 'attention':
+            pooled_features, attention_weights = self.pooling(features)
+        elif self.pooling_mode == 'max':
+            pooled_features = self.pooling(features.transpose(1, 2)).squeeze(-1)
+        elif self.pooling_mode == 'mean':
+            pooled_features = features.mean(dim=1)
+        
+        # Classify
+        logits = self.classifier(pooled_features)
+        
+        if self.pooling_mode == 'attention':
+            return logits, attention_weights
+        else:
+            return logits, None
+
+
 class ViTTinyMultiSliceClassifier(nn.Module):
     """
     Classifier that processes multiple slices with Vision Transformer Tiny from HuggingFace.

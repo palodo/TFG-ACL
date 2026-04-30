@@ -8,7 +8,7 @@ import torch
 # ==========================================
 # GPU CONFIGURATION (SHARED FOR ALL PLANES)
 # ==========================================
-VIT_GPU_IDS = [0, 1, 2]  # ViT usará 3 GPUs (GPU física 1,2,3 -> lógica 0,1,2) con DataParallel
+VIT_GPU_IDS = [0, 1, 2, 3]  # ViT usará 4 GPUs (GPU física 1,2,3,4 -> lógica 0,1,2,3) con DataParallel
 CNN_GPU_ID = 0  # CNN Selector usará GPU 0 durante pre-procesamiento (GPU física 1 -> lógica 0)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

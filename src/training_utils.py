@@ -178,12 +178,14 @@ def train_model(model, train_loader, val_loader, num_epochs, device, save_dir, p
                 use_scheduler=False, use_grad_clip=False, grad_clip_norm=1.0, early_stopping_patience=15,
                 dropout_input=0.3, dropout_dense=0.2, augmentation_mode='conservative',
                 data_path=None, plane_config=None, use_wandb=False, wandb_run=None, warmup_epochs=3,
-                use_lr_plateau_scheduler=False, lr_reduction_factor=0.5, lr_plateau_patience=5):
+                use_lr_plateau_scheduler=False, lr_reduction_factor=0.5, lr_plateau_patience=5,
+                freeze_backbone_epochs=0):
     """
     Main training function for a single plane.
     Automatically selects hyperparameters based on plane configuration.
     Integrates Weights & Biases for experiment tracking.
     Supports ReduceLROnPlateau for learning rate annealing when AUC plateaus.
+    Supports freeze_backbone_epochs for 2-stage transfer learning.
     
     Args:
         model: Neural network model (will be wrapped with DataParallel)
@@ -211,6 +213,7 @@ def train_model(model, train_loader, val_loader, num_epochs, device, save_dir, p
         use_lr_plateau_scheduler: Whether to reduce LR when AUC plateaus (NEW)
         lr_reduction_factor: Factor to multiply LR by when plateau detected (default 0.5)
         lr_plateau_patience: Epochs without AUC improvement before reducing LR (default 5)
+        freeze_backbone_epochs: Number of epochs to freeze backbone (only train classifier head) (NEW)
         
     Returns:
         history: dict with training history
@@ -275,6 +278,26 @@ def train_model(model, train_loader, val_loader, num_epochs, device, save_dir, p
             min_lr=MIN_LR
         )
     
+    # ===== FREEZE_BACKBONE SUPPORT (NEW) =====
+    def freeze_backbone():
+        """Freeze all parameters except the classifier head"""
+        model_to_freeze = model.module if isinstance(model, nn.DataParallel) else model
+        
+        # Freeze backbone (all layers except the final classifier)
+        for name, param in model_to_freeze.named_parameters():
+            # Only freeze if it's NOT part of the classifier (head)
+            if 'classifier' not in name and 'head' not in name:
+                param.requires_grad = False
+        
+        print(f"  🔒 Backbone frozen - training only classifier head")
+    
+    def unfreeze_backbone():
+        """Unfreeze all parameters for fine-tuning"""
+        model_to_freeze = model.module if isinstance(model, nn.DataParallel) else model
+        for param in model_to_freeze.parameters():
+            param.requires_grad = True
+        print(f"  🔓 Backbone unfrozen - full fine-tuning enabled")
+    
     # Variables for early stopping and tracking
     best_auc = 0.0
     best_f1 = 0.0
@@ -296,6 +319,13 @@ def train_model(model, train_loader, val_loader, num_epochs, device, save_dir, p
     
     # Training loop
     for epoch in range(1, num_epochs + 1):
+        # ===== HANDLE BACKBONE FREEZING (NEW) =====
+        if freeze_backbone_epochs > 0:
+            if epoch == 1:
+                freeze_backbone()
+            elif epoch == freeze_backbone_epochs + 1:
+                unfreeze_backbone()
+        
         # Step scheduler BEFORE training (for warmup to apply from epoch 1)
         if scheduler is not None:
             scheduler.step()
