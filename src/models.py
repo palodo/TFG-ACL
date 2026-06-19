@@ -48,7 +48,7 @@ class SimpleCNNSelector(nn.Module):
         super().__init__()
         
         # Load checkpoint
-        checkpoint = torch.load(checkpoint_path, map_location='cpu')
+        checkpoint = torch.load(checkpoint_path, map_location='cpu', weights_only=False)
         
         # Extract weights
         if 'model_state_dict' in checkpoint:
@@ -555,7 +555,88 @@ class SwinMultiSliceClassifier(nn.Module):
         
         # Classify
         logits = self.classifier(pooled_features)
-        
+
+        if self.pooling_mode == 'attention':
+            return logits, attention_weights
+        else:
+            return logits, None
+
+
+class SwinSmallMultiSliceClassifier(nn.Module):
+    """
+    Classifier that processes multiple slices with Swin Transformer SMALL.
+
+    IDÉNTICA en API y cabeza a SwinMultiSliceClassifier (que usa Swin-Tiny),
+    pero con el backbone real Swin-Small:
+    1. (B, K, 3, 224, 224) -> flatten -> (B*K, 3, 224, 224)
+    2. Swin-Small backbone -> features: (B*K, 768)
+    3. Reshape: (B, K, 768)
+    4. Attention/Max/Mean pooling -> (B, 768)
+    5. Classifier -> logit (B, 1)
+
+    Swin-Small specs:
+    - depths [2, 2, 18, 2] (vs Tiny [2, 2, 6, 2])
+    - embed_dim 96, feature_dim final 768 (igual que Tiny, cabeza compatible)
+    - ~48.8 M parámetros en el backbone (vs ~27.8 M en Tiny)
+    - Preentrenado en ImageNet-1K (tag .ms_in1k)
+    """
+    def __init__(self, num_classes=1, pretrained=True, pooling_mode='attention',
+                 dropout_input=0.3, dropout_dense=0.2):
+        super().__init__()
+
+        model_name = 'swin_small_patch4_window7_224.ms_in1k' if pretrained else 'swin_small_patch4_window7_224'
+
+        self.backbone = timm.create_model(
+            model_name,
+            pretrained=pretrained,
+            num_classes=0  # solo features
+        )
+
+        # Swin-Small produce features de 768 dimensiones (igual que Tiny)
+        self.feature_dim = 768
+
+        self.pooling_mode = pooling_mode
+        if pooling_mode == 'attention':
+            self.pooling = AttentionPooling(self.feature_dim)
+        elif pooling_mode == 'max':
+            self.pooling = nn.AdaptiveMaxPool1d(1)
+        elif pooling_mode == 'mean':
+            self.pooling = nn.AdaptiveAvgPool1d(1)
+
+        self.classifier = nn.Sequential(
+            nn.Dropout(dropout_input),
+            nn.Linear(self.feature_dim, 256),
+            nn.ReLU(),
+            nn.Dropout(dropout_dense),
+            nn.Linear(256, num_classes)
+        )
+
+    def forward(self, x):
+        """
+        Args:
+            x: tensor (batch_size, num_slices, 3, 224, 224)
+        Returns:
+            logits: tensor (batch_size, 1)
+            attention_weights: tensor (batch_size, num_slices) if pooling='attention'
+        """
+        batch_size, num_slices, C, H, W = x.shape
+
+        x = x.view(batch_size * num_slices, C, H, W)
+
+        features = self.backbone(x)  # (B*K, 768)
+
+        features = features.view(batch_size, num_slices, self.feature_dim)
+
+        attention_weights = None
+        if self.pooling_mode == 'attention':
+            pooled_features, attention_weights = self.pooling(features)
+        elif self.pooling_mode == 'max':
+            pooled_features = self.pooling(features.transpose(1, 2)).squeeze(-1)
+        elif self.pooling_mode == 'mean':
+            pooled_features = features.mean(dim=1)
+
+        logits = self.classifier(pooled_features)
+
         if self.pooling_mode == 'attention':
             return logits, attention_weights
         else:

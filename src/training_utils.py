@@ -179,7 +179,7 @@ def train_model(model, train_loader, val_loader, num_epochs, device, save_dir, p
                 dropout_input=0.3, dropout_dense=0.2, augmentation_mode='conservative',
                 data_path=None, plane_config=None, use_wandb=False, wandb_run=None, warmup_epochs=3,
                 use_lr_plateau_scheduler=False, lr_reduction_factor=0.5, lr_plateau_patience=5,
-                freeze_backbone_epochs=0):
+                freeze_backbone_epochs=0, pos_weight_factor=1.0):
     """
     Main training function for a single plane.
     Automatically selects hyperparameters based on plane configuration.
@@ -232,8 +232,9 @@ def train_model(model, train_loader, val_loader, num_epochs, device, save_dir, p
     
     # Compute pos_weight for class imbalance (BEFORE wandb setup)
     pos_weight = compute_pos_weight(train_loader)
+    pos_weight = pos_weight * pos_weight_factor  # Apply reduction factor
     print(f"📊 Class imbalance (pos_weight): {pos_weight.item():.4f}")
-    print(f"   (Ratio negatives:positives)\n")
+    print(f"   (Ratio negatives:positives × {pos_weight_factor})\n")
     
     # Initialize wandb if enabled
     if use_wandb and wandb_run is None:

@@ -1,0 +1,73 @@
+\begin{thebibliography}{10}
+
+\bibitem{bien2018deep}
+N.~Bien, P.~Rajpurkar, N.~P. Schrager, et~al.
+\newblock Deep-learning-assisted diagnosis for knee magnetic resonance imaging: Development and retrospective validation of mrnet.
+\newblock {\em PLOS Medicine}, 15(11):e1002699, 2018.
+
+\bibitem{he2016deep}
+K.~He, X.~Zhang, S.~Ren, and J.~Sun.
+\newblock Deep residual learning for image recognition.
+\newblock In {\em Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition}, pages 770--778, 2016.
+
+\bibitem{dosovitskiy2020image}
+A.~Dosovitskiy et~al.
+\newblock An image is worth 16x16 words: Transformers for image recognition at scale.
+\newblock In {\em International Conference on Learning Representations}, 2021.
+
+\bibitem{dai2021transmed}
+Y.~Dai et~al.
+\newblock Transmed: Transformers meet select-convolutions for multi-modal medical image classification.
+\newblock {\em Biosensors}, 11(11):443, 2021.
+
+\bibitem{liu2021swin}
+Z.~Liu et~al.
+\newblock Swin transformer: Hierarchical vision transformer using shifted windows.
+\newblock In {\em Proceedings of the IEEE/CVF International Conference on Computer Vision}, pages 10012--10022, 2021.
+
+\bibitem{tsai2020efficiently}
+C.~Tsai et~al.
+\newblock Efficiently localizing knee joint injury with elnet on mri.
+\newblock In {\em Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision}, pages 432--441, 2020.
+
+\bibitem{awan2022mvanet}
+M.~J. Awan et~al.
+\newblock Mvanet: Multi-view attention network for anterior cruciate ligament tear detection on knee mri.
+\newblock {\em Diagnostics}, 12(4):891, 2022.
+
+\bibitem{wang2023sgnet}
+S.~Wang et~al.
+\newblock Sgnet: Selective group attention network for knee joint abnormality classification.
+\newblock {\em Medical Physics}, 50(5):2912--2925, 2023.
+
+\bibitem{azcona2020anterior}
+M.~Azcona et~al.
+\newblock Anterior cruciate ligament tear detection in mri scans using deep learning classification with slice-level aggregation.
+\newblock {\em IEEE Access}, 8:112344--112353, 2020.
+
+\bibitem{alghothani2023attention}
+H.~Al~Ghothani and Y.~Zhang.
+\newblock Attention-guided cnn for knee joint injury diagnosis on the mrnet dataset.
+\newblock {\em Journal of Imaging}, 9(2):34, 2023.
+
+\bibitem{chen2021dual}
+T.~Chen et~al.
+\newblock Dual-branch efficientnet for anterior cruciate ligament injury classification.
+\newblock {\em Computerized Medical Imaging and Graphics}, 92:101962, 2021.
+
+\bibitem{joshi2023kneexnet}
+G.~Joshi and L.~Suganthi.
+\newblock Kneexnet: A graph convolutional network for knee joint injury classification and localized abnormality detection on mrnet dataset.
+\newblock {\em Medical Image Analysis}, 84:102715, 2023.
+
+\bibitem{martinez2022adapted}
+M.~Martinez et~al.
+\newblock An adapted 3d resnet-50 for magnetic resonance imaging classification of knee joint injuries.
+\newblock {\em Computers in Biology and Medicine}, 145:105423, 2022.
+
+\bibitem{wang2021weighted}
+Z.~Wang et~al.
+\newblock Weighted multi-view convolutional neural networks for anterior cruciate ligament tear detection.
+\newblock {\em BMC Medical Imaging}, 21(1):142, 2021.
+
+\end{thebibliography}

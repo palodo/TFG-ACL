@@ -1,0 +1,56 @@
+% -------------------------------------------------------------------------
+% ANEXOS - MATERIAL COMPLEMENTARIO
+% -------------------------------------------------------------------------
+
+Este anexo recoge información complementaria que, sin ser imprescindible para la lectura del cuerpo principal, facilita la reproducibilidad del trabajo y documenta decisiones de implementación.
+
+\section{Entorno de cómputo y reproducibilidad}
+
+Todos los experimentos se implementaron en Python utilizando PyTorch como marco de aprendizaje profundo, junto con las bibliotecas \texttt{timm} y \texttt{transformers} para la carga de los \textit{backbones} preentrenados. El entrenamiento se realizó sobre unidades de procesamiento gráfico (GPU) con aceleración CUDA.
+
+Para garantizar la reproducibilidad de los resultados se fijaron de forma explícita las semillas de los generadores de números aleatorios de PyTorch y NumPy, y se habilitó el modo determinista de cuDNN. Cada arquitectura se entrenó con diez semillas independientes (de la 42 a la 51), lo que permitió cuantificar la estabilidad del entrenamiento frente a la inicialización.
+
+La selección de cortes se precalculó y almacenó en caché, de modo que el selector MobileNetV2 no debe ejecutarse en cada iteración de entrenamiento, lo que acelera notablemente el proceso y asegura que todos los modelos se entrenen sobre exactamente los mismos cortes.
+
+\section{Configuración de aumentos de datos por plano}
+
+Los aumentos de datos (\textit{data augmentation}) se aplicaron únicamente sobre el conjunto de entrenamiento y se ajustaron de forma independiente por plano anatómico y arquitectura, buscando un equilibrio entre regularización y preservación de la información anatómica. La Tabla~\ref{tab:augmentation} resume la intensidad de aumentos empleada.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Intensidad de los aumentos de datos aplicados por arquitectura y plano anatómico.}
+\label{tab:augmentation}
+\begin{tabularx}{\textwidth}{
+>{\raggedright\arraybackslash}X
+>{\centering\arraybackslash}m{2.6cm}
+>{\centering\arraybackslash}m{2.6cm}
+>{\centering\arraybackslash}m{2.6cm}
+}
+\toprule
+\textbf{Arquitectura} &
+\textbf{Sagital} &
+\textbf{Coronal} &
+\textbf{Axial} \\
+\midrule
+ResNet50   & Agresivo      & Moderado & Agresivo \\
+ViT-Small  & Conservador   & Moderado & Agresivo \\
+Swin-Tiny  & Agresivo      & Agresivo & Agresivo \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Los modos de aumento se definieron de forma incremental. El modo \textit{conservador} aplica únicamente rotaciones y traslaciones pequeñas que preservan la anatomía; el modo \textit{moderado} añade volteos horizontales, variaciones de brillo y contraste y transformaciones afines suaves; y el modo \textit{agresivo} incorpora además rotaciones más amplias, distorsiones de perspectiva y mayores variaciones fotométricas.
+
+\section{Esquemas de fusión multi-vista explorados}
+
+Además del promedio simple de probabilidades utilizado en el cuerpo principal, durante el desarrollo se exploraron esquemas alternativos de fusión multi-vista:
+
+\begin{itemize}
+    \item \textbf{Promedio simple.} Media aritmética de las probabilidades de los tres planos. Es el esquema adoptado por no introducir parámetros adicionales y permitir una comparación directa entre arquitecturas.
+    \item \textbf{Votación por máximo.} Se toma la probabilidad máxima entre los tres planos, favoreciendo la detección cuando cualquiera de las vistas considera probable la lesión.
+    \item \textbf{Promedio ponderado por AUC.} Cada plano contribuye con un peso proporcional a su AUC de validación, otorgando mayor influencia a las vistas más fiables.
+\end{itemize}
+
+Estas alternativas ofrecieron resultados próximos al promedio simple, sin una mejora consistente que justificara su adopción frente a la mayor simplicidad e interpretabilidad del promedio aritmético.
+

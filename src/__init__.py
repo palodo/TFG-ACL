@@ -20,7 +20,8 @@ try:
     from .training_utils import train_model
     from .gpu_config import device, VIT_GPU_IDS, CNN_GPU_ID
 except ImportError as e:
-    print(f"Warning: Could not import all modules. {e}")
+    import sys
+    sys.stderr.write(f"Warning: Could not import all modules. {e}\n")
 
 __all__ = [
     'ConvNeXtMultiSliceClassifier',

@@ -1,0 +1,391 @@
+% Contenidos del capítulo.
+% Las secciones presentadas son orientativas y no representan
+% necesariamente la organización que debe tener este capítulo.
+
+% Diagramas de clases, de secuencia, de despliegue, diseño de
+% pantallas, etc
+
+% -------------------------------------------------------------------------
+% RESULTADOS RESNET50
+% -------------------------------------------------------------------------
+
+\subsection{Resultados del modelo convolucional ResNet50}
+\label{subsec:resultados_resnet50}
+
+En esta subsección se presentan los resultados obtenidos por la arquitectura convolucional \textit{ResNet50}, utilizada como modelo de referencia dentro del estudio. El análisis se estructura en tres apartados principales: evaluación individual por plano anatómico, análisis de estabilidad multi-semilla y rendimiento del ensamble multi-vista final.
+
+Además de las métricas cuantitativas presentadas en tablas, se incorporan las curvas de entrenamiento y validación correspondientes a cada modelo, permitiendo analizar visualmente la convergencia, estabilidad y comportamiento del proceso de optimización.
+
+\subsubsection{Rendimiento de los modelos individuales por plano anatómico}
+
+Con el objetivo de estudiar la contribución diagnóstica de cada proyección anatómica de forma independiente, se entrenaron clasificadores especializados sobre los planos sagital, coronal y axial utilizando la arquitectura ResNet50 junto con el mecanismo de \textit{Attention Pooling} descrito en el capítulo anterior.
+
+Los resultados obtenidos en validación y prueba interna se resumen en la Tabla~\ref{tab:resnet_individual}.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Rendimiento individual de los modelos ResNet50 por plano anatómico.}
+\label{tab:resnet_individual}
+\begin{tabularx}{\textwidth}{
+>{\raggedright\arraybackslash}X
+>{\centering\arraybackslash}m{2.2cm}
+>{\centering\arraybackslash}m{2.2cm}
+}
+\toprule
+\textbf{Plano Anatómico} &
+\textbf{AUC Validación} &
+\textbf{AUC Test} \\
+\midrule
+
+Sagital &
+0.9501 &
+0.8679 \\
+
+Coronal &
+0.9735 &
+0.9246 \\
+
+Axial &
+0.9704 &
+0.9294 \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Los resultados muestran diferencias relevantes entre los distintos planos anatómicos. El plano sagital obtuvo el menor rendimiento en el conjunto de prueba, mientras que los modelos coronal y axial alcanzaron una capacidad discriminatoria superior y más consistente.
+
+En particular, el plano axial obtuvo el mejor rendimiento individual en test, alcanzando un AUC de $0.9294$. Este comportamiento puede estar relacionado con la menor variabilidad geométrica presente en dicha proyección, así como con la estrategia de selección de cortes centrales consecutivos utilizada durante el entrenamiento.
+
+Las curvas de entrenamiento muestran además un comportamiento relativamente estable en los tres planos, aunque el modelo sagital presenta una mayor separación entre entrenamiento y validación durante las últimas épocas, indicando una mayor tendencia al sobreajuste.
+
+% FIGURAS DE ENTRENAMIENTO
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=\textwidth]{resnet_training_curves.png}
+% \caption{Curvas de entrenamiento y validación de ResNet50 para cada plano anatómico.}
+% \label{fig:resnet_training}
+% \end{figure}
+
+\subsubsection{Análisis de estabilidad multi-semilla}
+
+Con el objetivo de analizar la robustez del entrenamiento frente a la inicialización aleatoria de los pesos y al comportamiento estocástico de los mini-batches, se realizó un estudio multi-semilla utilizando diez semillas independientes comprendidas entre 42 y 51.
+
+La Tabla~\ref{tab:multiseed_resnet50} resume las principales métricas estadísticas obtenidas para cada plano anatómico.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Análisis de estabilidad multi-semilla para la arquitectura ResNet50.}
+\label{tab:multiseed_resnet50}
+\begin{tabularx}{\textwidth}{
+>{\raggedright\arraybackslash}X
+>{\centering\arraybackslash}m{1.8cm}
+>{\centering\arraybackslash}m{1.8cm}
+>{\centering\arraybackslash}m{1.8cm}
+>{\centering\arraybackslash}m{1.8cm}
+>{\centering\arraybackslash}m{1.8cm}
+}
+\toprule
+\textbf{Plano} &
+\textbf{AUC Medio} &
+\textbf{Desv. Est.} &
+\textbf{AUC Mín.} &
+\textbf{AUC Máx.} &
+\textbf{Mejor Semilla} \\
+\midrule
+
+Sagital &
+0.9425 &
+0.0170 &
+0.9132 &
+0.9638 &
+46 \\
+
+Coronal &
+0.9390 &
+0.0169 &
+0.8973 &
+0.9638 &
+44 \\
+
+Axial &
+\textbf{0.9610} &
+\textbf{0.0087} &
+\textbf{0.9501} &
+\textbf{0.9810} &
+\textbf{51} \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+El análisis multi-semilla permite observar diferencias claras de estabilidad entre los distintos planos anatómicos. El plano axial presenta tanto el mayor rendimiento medio como la menor desviación estándar, indicando un comportamiento considerablemente más estable durante el entrenamiento.
+
+Por el contrario, los modelos sagital y coronal muestran una mayor variabilidad entre ejecuciones, especialmente en determinadas semillas donde la convergencia resulta menos consistente.
+
+\subsubsection{Resultados del ensamble multi-vista}
+
+Una vez evaluados los clasificadores individuales, se construyó un ensamble multi-vista combinando las salidas probabilísticas de los mejores modelos de cada plano anatómico.
+
+La fusión final se realizó mediante una estrategia de combinación ponderada de probabilidades, integrando la información complementaria procedente de las distintas proyecciones anatómicas.
+
+Adicionalmente, se realizó una calibración del umbral de decisión utilizando el conjunto de validación interna. El umbral óptimo obtenido fue:
+
+\begin{equation}
+\tau = 0.57
+\end{equation}
+
+La Tabla~\ref{tab:ensemble_resnet50} resume el rendimiento final del ensamble.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Rendimiento diagnóstico del ensamble multi-vista basado en ResNet50.}
+\label{tab:ensemble_resnet50}
+\begin{tabularx}{\textwidth}{
+>{\raggedright\arraybackslash}X
+>{\centering\arraybackslash}m{1.6cm}
+>{\centering\arraybackslash}m{1.6cm}
+>{\centering\arraybackslash}m{1.6cm}
+>{\centering\arraybackslash}m{1.8cm}
+>{\centering\arraybackslash}m{1.8cm}
+}
+\toprule
+\textbf{Conjunto} &
+\textbf{AUC} &
+\textbf{F1} &
+\textbf{Precisión} &
+\textbf{Sensibilidad} &
+\textbf{Especificidad} \\
+\midrule
+
+Validación &
+0.9879 &
+0.8831 &
+0.8293 &
+0.9444 &
+0.9539 \\
+
+Test &
+0.9432 &
+0.7708 &
+0.6981 &
+0.8605 &
+0.8889 \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+El ensamble multi-vista obtuvo un rendimiento superior al de cualquiera de los modelos individuales, alcanzando un AUC de $0.9432$ sobre el conjunto de prueba interno.
+
+La combinación de información procedente de múltiples planos anatómicos permitió mejorar tanto la sensibilidad como la especificidad diagnóstica, compensando parcialmente las limitaciones presentes en cada vista individual.
+
+% ROC
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=0.8\textwidth]{roc_resnet50.png}
+% \caption{Curvas ROC del ensamble multi-vista basado en ResNet50.}
+% \label{fig:roc_resnet50}
+% \end{figure}
+
+
+% -------------------------------------------------------------------------
+% RESULTADOS VIT-BASE
+% -------------------------------------------------------------------------
+
+% -------------------------------------------------------------------------
+% RESULTADOS VIT-BASE
+% -------------------------------------------------------------------------
+
+\subsection{Resultados del modelo Vision Transformer (ViT-Base)}
+\label{subsec:resultados_vitbase}
+
+En esta subsección se presentan los resultados obtenidos por la arquitectura basada en atención global \textit{Vision Transformer Base} (ViT-Base). El análisis sigue la misma estructura empleada para ResNet50, incluyendo la evaluación individual por plano anatómico, el estudio de estabilidad multi-semilla y el rendimiento final del ensamble multi-vista.
+
+Además de las métricas cuantitativas, se incorporan las curvas de entrenamiento y validación correspondientes a cada plano anatómico. Estas gráficas permiten analizar visualmente la convergencia del modelo y detectar posibles diferencias de estabilidad entre ejecuciones.
+
+\subsubsection{Rendimiento de los modelos individuales por plano anatómico}
+
+Se entrenaron clasificadores independientes \textit{ViT-Base} sobre los planos sagital, coronal y axial, utilizando el mecanismo de agregación multicorte descrito en el capítulo metodológico.
+
+Los resultados obtenidos en validación y prueba interna se resumen en la Tabla~\ref{tab:vit_individual}.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Rendimiento individual de los modelos ViT-Base por plano anatómico.}
+\label{tab:vit_individual}
+\begin{tabularx}{\textwidth}{
+>{\raggedright\arraybackslash}X
+>{\centering\arraybackslash}m{2.2cm}
+>{\centering\arraybackslash}m{2.2cm}
+}
+\toprule
+\textbf{Plano anatómico} &
+\textbf{AUC Validación} &
+\textbf{AUC Test} \\
+\midrule
+
+Sagital &
+0.9534 &
+0.9031 \\
+
+Coronal &
+0.9346 &
+0.9233 \\
+
+Axial &
+0.9755 &
+0.9075 \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Los resultados muestran que ViT-Base alcanza un rendimiento competitivo en los tres planos anatómicos. El plano coronal obtuvo el mejor rendimiento individual sobre el conjunto de prueba, con un AUC de $0.9233$, mientras que el plano axial presentó el mayor AUC en validación.
+
+Este comportamiento indica que, cuando el modelo converge correctamente, la arquitectura ViT-Base es capaz de extraer representaciones discriminativas útiles para la clasificación de lesiones del LCA. Sin embargo, como se analiza en la siguiente subsección, el rendimiento del modelo presenta una variabilidad importante entre distintas semillas de entrenamiento.
+
+% FIGURAS DE ENTRENAMIENTO
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=\textwidth]{vit_training_curves.png}
+% \caption{Curvas de entrenamiento y validación de ViT-Base para cada plano anatómico.}
+% \label{fig:vit_training}
+% \end{figure}
+
+\subsubsection{Análisis de estabilidad multi-semilla}
+
+Con el objetivo de evaluar la robustez del entrenamiento, se realizó un análisis multi-semilla utilizando diez inicializaciones independientes comprendidas entre las semillas 42 y 51.
+
+La Tabla~\ref{tab:multiseed_vitbase} resume las principales métricas estadísticas obtenidas para cada plano anatómico.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Análisis de estabilidad multi-semilla para la arquitectura ViT-Base.}
+\label{tab:multiseed_vitbase}
+\begin{tabularx}{\textwidth}{
+>{\raggedright\arraybackslash}X
+>{\centering\arraybackslash}m{1.8cm}
+>{\centering\arraybackslash}m{1.8cm}
+>{\centering\arraybackslash}m{1.8cm}
+>{\centering\arraybackslash}m{1.8cm}
+>{\centering\arraybackslash}m{1.8cm}
+}
+\toprule
+\textbf{Plano} &
+\textbf{AUC Medio} &
+\textbf{Desv. Est.} &
+\textbf{AUC Mín.} &
+\textbf{AUC Máx.} &
+\textbf{Mejor Semilla} \\
+\midrule
+
+Sagital &
+0.9548 &
+0.0068 &
+0.9433 &
+0.9633 &
+47 \\
+
+Coronal &
+0.8923 &
+0.0355 &
+0.8419 &
+0.9435 &
+50 \\
+
+Axial &
+0.9570 &
+0.0130 &
+0.9327 &
+0.9720 &
+43 \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+El análisis multi-semilla muestra diferencias claras de estabilidad entre planos anatómicos. El plano sagital presentó la menor desviación estándar ($\sigma = 0.0068$), indicando un comportamiento muy estable entre ejecuciones. El plano axial también mantuvo un rendimiento medio elevado, aunque con una variabilidad algo superior.
+
+Por el contrario, el plano coronal mostró una desviación estándar considerablemente mayor ($\sigma = 0.0355$), con una diferencia notable entre la mejor y la peor ejecución. En algunas semillas, el modelo no lograba iniciar una convergencia adecuada durante las primeras épocas y permanecía en estados de baja capacidad discriminatoria incluso tras continuar el entrenamiento.
+
+Este fenómeno no implica que ViT-Base sea una arquitectura poco útil, sino que su entrenamiento resulta más sensible a la inicialización y al proceso de optimización. De hecho, cuando el modelo converge correctamente, alcanza valores de AUC elevados y comparables a los obtenidos por arquitecturas convolucionales.
+
+Una posible explicación se encuentra en la propia naturaleza de los Vision Transformers. A diferencia de las CNN, ViT-Base no incorpora de forma explícita sesgos inductivos de localidad espacial o invarianza a la traslación. En su lugar, procesa la imagen como una secuencia global de parches y debe aprender durante el entrenamiento qué relaciones espaciales son relevantes para la tarea.
+
+Esta característica puede ser ventajosa cuando el modelo dispone de suficientes datos o converge hacia una representación adecuada, ya que le permite capturar relaciones anatómicas de largo alcance. Sin embargo, en conjuntos de datos médicos de tamaño moderado, también puede aumentar la sensibilidad a la inicialización de los pesos, al orden de los mini-batches y a la regularización aplicada.
+
+El problema fue especialmente visible en el plano coronal. En esta proyección, el LCA puede aparecer de forma parcial, con menor continuidad visual y mayor oclusión por estructuras óseas o tejidos circundantes. Al dividir la imagen en parches, la información relevante del ligamento puede quedar concentrada en una región reducida. Si durante las primeras épocas los mapas de atención no se orientan hacia estas zonas informativas, el modelo puede converger hacia representaciones poco discriminativas.
+
+Por tanto, los resultados sugieren que ViT-Base posee una elevada capacidad representacional, pero también una mayor inestabilidad de entrenamiento respecto a modelos con sesgos espaciales más fuertes. Esta observación justifica la necesidad de analizar el comportamiento multi-semilla, en lugar de reportar únicamente la mejor ejecución individual.
+
+\subsubsection{Resultados del ensamble multi-vista}
+
+Una vez evaluados los clasificadores individuales, se construyó un ensamble multi-vista combinando las probabilidades de salida de los mejores modelos de cada plano anatómico.
+
+La integración final se realizó mediante una estrategia de combinación ponderada de probabilidades. Adicionalmente, se llevó a cabo una calibración del umbral de decisión utilizando el conjunto de validación interna, obteniéndose un valor óptimo de:
+
+\begin{equation}
+\tau = 0.64
+\end{equation}
+
+La Tabla~\ref{tab:ensemble_vitbase} resume el rendimiento final del ensamble.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Rendimiento diagnóstico del ensamble multi-vista basado en ViT-Base.}
+\label{tab:ensemble_vitbase}
+\begin{tabularx}{\textwidth}{
+>{\raggedright\arraybackslash}X
+>{\centering\arraybackslash}m{1.6cm}
+>{\centering\arraybackslash}m{1.6cm}
+>{\centering\arraybackslash}m{1.6cm}
+>{\centering\arraybackslash}m{1.8cm}
+>{\centering\arraybackslash}m{1.8cm}
+}
+\toprule
+\textbf{Conjunto} &
+\textbf{AUC} &
+\textbf{F1} &
+\textbf{Precisión} &
+\textbf{Sensibilidad} &
+\textbf{Umbral} \\
+\midrule
+
+Validación &
+0.9759 &
+0.8571 &
+0.8824 &
+0.8333 &
+0.64 \\
+
+Test &
+0.9444 &
+0.7525 &
+0.6981 &
+0.8605 &
+0.64 \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+El ensamble multi-vista basado en ViT-Base obtuvo un AUC de $0.9444$ sobre el conjunto de prueba interno, superando el rendimiento de cualquiera de los clasificadores individuales.
+
+Este resultado muestra que, pese a la variabilidad observada en algunos modelos de plano único, la combinación de distintas proyecciones anatómicas permite obtener un sistema final robusto y competitivo. La fusión multi-vista compensa parcialmente las limitaciones de cada plano individual y aprovecha la información complementaria presente en las tres orientaciones de la RM.
+
+Además, el sistema mantuvo una sensibilidad elevada ($86.05\%$), detectando correctamente la mayoría de las lesiones presentes en el conjunto de prueba. Por tanto, aunque ViT-Base mostró una mayor sensibilidad al proceso de entrenamiento, su capacidad representacional permitió alcanzar un rendimiento final muy competitivo cuando se integró dentro del esquema de ensamble.
+
+% ROC
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=0.8\textwidth]{roc_vitbase.png}
+% \caption{Curvas ROC del ensamble multi-vista basado en ViT-Base.}
+% \label{fig:roc_vitbase}
+% \end{figure}

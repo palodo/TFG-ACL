@@ -1,0 +1,172 @@
+\documentclass[twoside,spanish,a4paper,12pt]{tfg}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{float}
+\usepackage{amsmath}
+
+% Evita que LaTeX estire verticalmente las páginas con muchas figuras [H]
+% (el espacio sobrante queda al final de la página en vez de repartirse entre
+% párrafos), eliminando el espaciado vertical irregular del capítulo de resultados.
+\raggedbottom
+
+% Editar la titulación
+\titulacion{Grado en Ciencia de Datos}
+
+% Editar el título
+\title{Diagnóstico de lesiones de rodilla utilizando imágenes de resonancia magnética}
+
+% Si es una alumna se debe usar
+% \authorlabel{Autora}
+\authorlabel{Autor}
+% Editar el nombre
+\author{Pablo López Domínguez}
+
+
+% Si hay varios tutores:
+\tutorlabel{Tutores}
+\tutor{\shortstack[l]{\\[2mm] José David Martín Guerrero \\ Yolanda Vives Gilabert}}
+% Si el tutor es masculino:
+% \tutorlabel{Tutor}
+%\tutorlabel{Tutora}
+% Editar
+%\tutor{El nombre de la tutora}
+
+% Editar: Poner mes y año de la convocatoria de lectura del TFM
+\convocatoria{Julio 2026}
+
+\begin{document}
+
+% NO QUITAR ESTOS ELEMENTOS
+\portada
+\cleardoublepage
+\contraportada
+\cleardoublepage
+\declaracion
+\cleardoublepage
+
+
+% Editar: Resumen en Español (obligatorio)
+\begin{resumen}
+El diagnóstico de lesiones de rodilla mediante imágenes de resonancia magnética (RM) constituye un proceso fundamental en la práctica clínica, que exige un elevado grado de especialización y un considerable consumo de tiempo por parte de los profesionales sanitarios. En este contexto, el presente trabajo aborda la aplicación de técnicas avanzadas de aprendizaje profundo con el objetivo de automatizar y optimizar la detección de patologías en imágenes médicas.
+
+Concretamente, se han implementado y evaluado tres arquitecturas representativas del estado del arte en visión por computador: una red neuronal convolucional profunda (ResNet) y dos modelos basados en mecanismos de atención tipo transformer (Vision Transformer y Swin Transformer). Dichos modelos han sido entrenados y validados sobre un conjunto de datos de imágenes de resonancia magnética de rodilla, con el propósito de analizar su capacidad para identificar patrones relevantes asociados a distintos tipos de lesiones.
+
+Los resultados obtenidos permiten establecer una comparación rigurosa entre los diferentes enfoques, poniendo de manifiesto las ventajas y limitaciones de cada arquitectura en términos de precisión, capacidad de generalización y eficiencia computacional. Asimismo, se discuten las implicaciones de estos hallazgos en el ámbito clínico, así como las principales limitaciones del estudio.
+
+Finalmente, se proponen diversas líneas de investigación futura orientadas a mejorar la robustez y la aplicabilidad de estos modelos en entornos clínicos reales. Este trabajo contribuye al avance del uso de técnicas de aprendizaje profundo en el diagnóstico médico, evidenciando el potencial de las arquitecturas basadas en transformers frente a enfoques tradicionales basados en convoluciones.
+\end{resumen}
+\cleardoublepage
+
+% Editar: Resumen en Inglés
+\begin{abstract}
+The diagnosis of knee injuries using magnetic resonance imaging (MRI) is a fundamental task in clinical practice, requiring a high level of expertise and a significant investment of time from medical professionals. In this context, this work explores the application of advanced deep learning techniques with the aim of automating and enhancing the detection of pathologies in medical images.
+
+Specifically, three representative state-of-the-art computer vision architectures have been implemented and evaluated: a deep convolutional neural network (ResNet) and two transformer-based models (Vision Transformer and Swin Transformer). These models have been trained and validated on a dataset of knee MRI images in order to assess their ability to identify relevant patterns associated with different types of injuries.
+
+The obtained results enable a rigorous comparison between the different approaches, highlighting the strengths and limitations of each architecture in terms of accuracy, generalization capability, and computational efficiency. Furthermore, the implications of these findings in the clinical domain are discussed, along with the main limitations of the study.
+
+Finally, several future research directions are proposed to improve the robustness and applicability of these models in real clinical environments. This work contributes to the advancement of deep learning techniques in medical diagnosis, demonstrating the potential of transformer-based architectures compared to traditional convolutional approaches.
+\end{abstract}
+\cleardoublepage
+
+% Editar: Resumen en Valenciano
+\begin{resumen}
+El diagnòstic de lesions de genoll mitjançant imatges de ressonància magnètica (RM) constitueix una tasca fonamental en la pràctica clínica, que requereix un alt nivell d'especialització i un considerable consum de temps per part dels professionals sanitaris. En aquest context, el present treball aborda l'aplicació de tècniques avançades d'aprenentatge profund amb l'objectiu d'automatitzar i millorar la detecció de patologies en imatges mèdiques.
+
+Concretament, s'han implementat i avaluat tres arquitectures representatives de l'estat de l'art en visió per computador: una xarxa neuronal convolucional profunda (ResNet) i dos models basats en mecanismes d'atenció de tipus transformer (Vision Transformer i Swin Transformer). Aquests models han sigut entrenats i validats sobre un conjunt de dades d'imatges de ressonància magnètica de genoll, amb la finalitat d'analitzar la seua capacitat per identificar patrons rellevants associats a diferents tipus de lesions.
+
+Els resultats obtinguts permeten establir una comparació rigorosa entre els diferents enfocaments, posant de manifest les fortaleses i limitacions de cada arquitectura en termes de precisió, capacitat de generalització i eficiència computacional. Així mateix, es discuteixen les implicacions d'aquests resultats en l'àmbit clínic, així com les principals limitacions de l'estudi.
+
+Finalment, es proposen diverses línies de treball futur orientades a millorar la robustesa i l'aplicabilitat d'aquests models en entorns clínics reals. Aquest treball contribueix a l'avanç de les tècniques d'aprenentatge profund en el diagnòstic mèdic, evidenciant el potencial de les arquitectures basades en transformers enfront dels enfocaments tradicionals basats en convolucions.
+\end{resumen}
+\cleardoublepage
+
+
+
+% Editar: Agradecimientos (opcional)
+\begin{agradecimientos}
+
+En primer lugar, quiero expresar mi más sincero agradecimiento a mis tutores, David y Yolanda, por su orientación, apoyo y dedicación a lo largo de la realización de este trabajo. Su experiencia, sus consejos y su disponibilidad han sido fundamentales para el desarrollo de este proyecto.
+
+\vspace{0.5em}
+
+Asimismo, me gustaría agradecer a todos los profesores que han formado parte de mi formación académica durante estos años, por haber contribuido a mi aprendizaje y haber despertado mi interés por el ámbito de la Ciencia de Datos.
+
+\vspace{0.5em}
+
+De manera especial, quiero dar las gracias a mis amigos y compañeros, por su apoyo constante, motivación y por compartir conmigo este camino.
+
+\vspace{0.5em}
+
+Quiero también agradecer especialmente a Laura, por haberme apoyado de manera incondicional durante toda la carrera, por su paciencia, su comprensión y por haber estado a mi lado incluso en los momentos más difíciles. Este camino habría sido mucho más difícil sin ti.
+
+\vspace{0.5em}
+
+Finalmente, quiero expresar mi más profundo agradecimiento a mi familia y seres queridos, por su apoyo incondicional, su paciencia y su confianza en mí a lo largo de toda esta etapa. Sin ellos, nada de esto habría sido posible.
+
+\end{agradecimientos}
+\cleardoublepage
+
+\tableofcontents
+
+\pagestyle{tfg}
+\justify
+
+% Las figuras se buscan en el directorio figs
+
+% Cada capítulo está en su propio fichero tex. Ver el directorio tex.
+
+% La bibliografía está dentro del directorio bib
+\chapter{Introducción}
+\input{tex/introduccion.tex}
+
+\chapter{Materiales}
+\input{tex/materiales.tex}
+
+\chapter{Métodos}
+\input{tex/metodologia.tex}
+
+\chapter{Resultados y Discusión}
+\input{tex/resultados.tex}
+
+\chapter{Aplicación: demostrador clínico interactivo}
+\input{tex/aplicacion.tex}
+
+\chapter{Conclusiones (obligatorio) y proyección futura. }
+\input{tex/conclusiones.tex}
+
+
+\addcontentsline{toc}{chapter}{Bibliografía}
+\bibliographystyle{unsrt}
+\bibliography{bib/bibliografia}
+
+% -------------------------------------------------------------------------
+% ANEXOS
+% -------------------------------------------------------------------------
+\appendix
+\addcontentsline{toc}{chapter}{Anexos}
+\chapter{Material complementario}
+\input{tex/anexos.tex}
+
+
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

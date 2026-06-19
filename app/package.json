@@ -1,0 +1,17 @@
+{
+  "name": "acl-diagnosis-assistant",
+  "version": "1.0.0",
+  "description": "Premium Medical Diagnostic Assistant for Knee ACL Lesion Detection",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "cd frontend && npm install && npm run build"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^9.0.1"
+  }
+}

@@ -1,0 +1,44 @@
+\label{cap:aplicacion}
+
+Con el objetivo de ilustrar la aplicabilidad práctica del sistema desarrollado, se implementó una aplicación web interactiva que integra el \textit{pipeline} completo de diagnóstico. La aplicación permite cargar un estudio de resonancia magnética real, ejecutar la inferencia con cualquiera de las tres arquitecturas evaluadas y visualizar tanto la predicción final como mapas de explicabilidad que destacan las regiones más relevantes para la decisión del modelo.
+
+\section{Arquitectura de la aplicación}
+
+La aplicación sigue una arquitectura cliente--servidor desacoplada en tres componentes:
+
+\begin{itemize}
+    \item \textbf{Interfaz de usuario (\textit{frontend}).} Desarrollada con React, presenta un visor de cortes de RM al estilo de una estación de trabajo clínica (PACS), permite seleccionar el modelo de inferencia y muestra de forma progresiva los resultados a medida que se calculan.
+
+    \item \textbf{Servidor intermedio (\textit{BFF, Backend for Frontend}).} Implementado en Node.js con Express, gestiona la subida segura del estudio comprimido, valida el archivo y orquesta la ejecución del motor de inferencia, transmitiendo los resultados al cliente en tiempo real mediante \textit{streaming}.
+
+    \item \textbf{Motor de inferencia.} Un proceso en Python que descomprime de forma segura el estudio DICOM, reconstruye los volúmenes por plano anatómico, aplica el selector de cortes, ejecuta el ensamble multi-vista y genera los mapas de explicabilidad.
+\end{itemize}
+
+\section{Flujo de procesamiento de un estudio}
+
+El flujo replica fielmente el \textit{pipeline} descrito en el capítulo de métodos. A partir de un archivo comprimido con la serie DICOM del paciente, la aplicación realiza de forma automática los siguientes pasos:
+
+\begin{enumerate}
+    \item Descompresión segura del archivo y lectura de las cabeceras DICOM, con detección automática del plano anatómico de cada serie.
+    \item Reconstrucción y ordenación espacial de los volúmenes sagital, coronal y axial.
+    \item Selección de los cortes más relevantes por plano mediante el selector MobileNetV2.
+    \item Inferencia con la arquitectura seleccionada (ResNet50, ViT-Small o Swin-Tiny) y fusión multi-vista de las probabilidades.
+    \item Aplicación del umbral calibrado específico del modelo y presentación del diagnóstico final junto con un nivel de confianza.
+\end{enumerate}
+
+Por motivos de privacidad, cuando los metadatos del estudio no están disponibles la aplicación los sustituye por valores anónimos, evitando mostrar información identificable del paciente.
+
+\section{Explicabilidad de las predicciones}
+
+Una característica central de la aplicación es la generación de mapas de explicabilidad que acompañan a cada predicción, adaptados a cada arquitectura: para ResNet50 se emplea \textit{Grad-CAM} sobre la última etapa convolucional; para Swin-Tiny, mapas de saliencia basados en el gradiente de la entrada; y para ViT-Small, los mapas de autoatención del último bloque \textit{Transformer}. En los tres casos, el mapa resultante se normaliza de forma robusta mediante percentiles, se realza con una corrección gamma y se superpone sobre el corte original como una capa de calor semitransparente, de modo que solo las regiones con activación relevante quedan resaltadas.
+
+La Figura~\ref{fig:app_explicabilidad_3modelos} compara estas tres técnicas sobre los mismos cortes sagitales de un caso real de validación con rotura del LCA. Pese a las diferencias de resolución y aspecto inherentes a cada método ---regiones amplias y suaves en el \textit{Grad-CAM} de ResNet50, estructura en parches en la atención de ViT-Small y mapas más finos en la saliencia de Swin-Tiny---, las tres arquitecturas concentran su activación en la región intercondílea, donde se localiza el ligamento, y las tres asignan al caso una probabilidad de rotura elevada.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figs/outputs/explicabilidad_3modelos_sagital.png}
+\caption{Mapas de explicabilidad generados por la aplicación para las tres arquitecturas sobre los mismos cinco cortes sagitales de un caso de validación con rotura del LCA. De arriba a abajo: \textit{Grad-CAM} de ResNet50, atención del último bloque de ViT-Small y saliencia por gradiente de Swin-Tiny. Entre paréntesis se indica la probabilidad media de rotura asignada por cada modelo. La superposición reproduce el visor de la aplicación (modo de fusión \textit{screen} con opacidad reducida), de modo que solo las regiones con activación relevante quedan resaltadas sobre la anatomía.}
+\label{fig:app_explicabilidad_3modelos}
+\end{figure}
+
+Estos mapas no constituyen una validación clínica formal, pero permiten al usuario contrastar visualmente si la atención del modelo se concentra en la región del LCA, aportando un grado de transparencia que es especialmente valioso en el ámbito médico, donde la interpretabilidad de las decisiones automáticas resulta determinante para su aceptación.

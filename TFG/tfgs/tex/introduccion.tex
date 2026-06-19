@@ -1,0 +1,355 @@
+% Contenidos del capítulo.
+% Las secciones presentadas son orientativas y no representan
+% necesariamente la organización que debe tener este capítulo.
+
+
+\section{Contexto y Motivación}
+
+El diagnóstico de lesiones de rodilla constituye un desafío relevante en el ámbito de la medicina deportiva, especialmente en contextos de alta exigencia física donde la incidencia de patologías articulares, como la rotura del ligamento cruzado anterior (ACL), es especialmente elevada. Este tipo de lesiones no solo tiene un impacto inmediato en el rendimiento deportivo, sino que también puede condicionar la trayectoria profesional de los deportistas y afectar a su calidad de vida a largo plazo.
+
+En estos escenarios, la resonancia magnética (RM) se erige como una herramienta fundamental para la evaluación clínica, permitiendo la identificación precisa de lesiones en estructuras internas de la articulación como ligamentos, meniscos o cartílago. Su carácter no invasivo y su alta capacidad de resolución la convierten en una técnica indispensable dentro del proceso diagnóstico. No obstante, la interpretación de estas imágenes requiere un alto grado de especialización y experiencia por parte de los radiólogos.
+
+En la práctica clínica, este proceso de análisis suele estar condicionado por la elevada carga asistencial, lo que puede traducirse en tiempos de espera significativos para la obtención de un informe diagnóstico. Esta situación resulta especialmente crítica en contextos deportivos, donde la rapidez en la toma de decisiones puede influir directamente en el tratamiento, la recuperación y la planificación del retorno a la actividad.
+
+La motivación de este trabajo surge tanto del interés académico como de la experiencia personal en el ámbito del deporte de alto nivel durante la etapa de formación, compitiendo en entornos de elevada exigencia. Este tipo de contextos, caracterizados por una gran intensidad competitiva y física, implican también una mayor exposición a lesiones de gravedad.
+
+En este sentido, he sufrido varias lesiones de rodilla de carácter severo, incluyendo roturas del ligamento cruzado anterior, que han requerido múltiples intervenciones quirúrgicas y un seguimiento clínico prolongado basado en la realización de numerosas resonancias magnéticas. A lo largo de este proceso, he podido observar de manera directa no solo la importancia crítica del diagnóstico por imagen, sino también las limitaciones existentes en términos de tiempo de respuesta, acceso a especialistas y necesidad de interpretación experta.
+
+Esta experiencia despertó un interés inicial por comprender e interpretar las imágenes de resonancia magnética de rodilla, motivado tanto por la necesidad personal como por la curiosidad técnica. Paralelamente, durante el desarrollo del Grado en Ciencia de Datos, los conocimientos adquiridos en áreas como el aprendizaje automático, el análisis de datos y la visión por computador permitieron identificar el potencial de estas tecnologías para abordar problemas complejos en el ámbito médico.
+
+En los últimos años, el avance de las técnicas de aprendizaje profundo ha supuesto un cambio significativo en el campo de la visión por computador, permitiendo desarrollar modelos capaces de extraer patrones complejos a partir de grandes volúmenes de datos. Estas capacidades abren la puerta a su aplicación en el análisis de imágenes médicas, donde pueden actuar como herramientas de apoyo en la detección de patologías.
+
+A partir de esta combinación de experiencia personal y formación académica, surge la idea de explorar el uso de herramientas basadas en aprendizaje profundo para asistir en la detección de lesiones a partir de imágenes médicas. De este modo, este proyecto se sitúa en la intersección entre una problemática clínica real y las capacidades tecnológicas actuales, con la finalidad de analizar posibles soluciones que contribuyan a mejorar la eficiencia del proceso diagnóstico y el apoyo a los profesionales sanitarios.
+
+
+\section{Objetivos}
+
+El objetivo principal de este trabajo es analizar el potencial de técnicas de aprendizaje profundo en la detección de lesiones de rodilla a partir de imágenes de resonancia magnética, evaluando su aplicabilidad como herramientas de apoyo en el ámbito clínico.
+
+Para alcanzar este objetivo general, se plantean los siguientes objetivos específicos:
+
+\begin{itemize}
+    \item Estudiar el estado del arte en el uso de técnicas de visión por computador y aprendizaje profundo aplicadas al análisis de imágenes médicas, con especial atención al diagnóstico de lesiones de rodilla.
+    
+    \item Seleccionar, implementar y adaptar distintas arquitecturas representativas del estado del arte, incluyendo modelos basados en redes neuronales convolucionales (ResNet) y modelos basados en transformers (Vision Transformer y Swin Transformer).
+    
+    \item Preparar y procesar un conjunto de datos de imágenes de resonancia magnética de rodilla, incluyendo tareas de preprocesado, normalización y partición en conjuntos de entrenamiento, validación y prueba.
+    
+    \item Entrenar los modelos seleccionados y ajustar sus parámetros con el fin de optimizar su rendimiento en la tarea de clasificación o detección de lesiones.
+    
+    \item Evaluar de forma rigurosa el rendimiento de los diferentes modelos mediante métricas adecuadas, analizando su precisión, capacidad de generalización y eficiencia computacional.
+    
+    \item Comparar los resultados obtenidos entre las distintas arquitecturas, identificando sus principales fortalezas y limitaciones en el contexto del problema abordado.
+    
+    \item Analizar la viabilidad del uso de estos modelos como herramientas de apoyo al diagnóstico clínico, considerando tanto sus ventajas como sus posibles limitaciones en entornos reales.
+  
+\end{itemize}
+
+
+\section{Estado del Arte}
+
+En los últimos años, el uso de técnicas de aprendizaje profundo en imagen médica ha experimentado un crecimiento notable, especialmente en tareas de clasificación, detección y segmentación sobre imágenes de resonancia magnética (RM). En el caso concreto del diagnóstico de lesiones de rodilla, este avance ha estado impulsado por la disponibilidad de conjuntos de datos públicos y por la mejora progresiva de las arquitecturas de visión por computador. En este contexto, la detección automatizada de lesiones del ligamento cruzado anterior (LCA) a partir de imágenes de resonancia magnética se ha consolidado como una línea de investigación de gran relevancia.
+
+A nivel metodológico, una parte importante de la investigación reciente se ha centrado en el desarrollo de modelos de clasificación directa de extremo a extremo (\textit{end-to-end}). Aunque existen propuestas que plantean sistemas híbridos basados en una segmentación o localización previa de la región de interés antes de realizar la clasificación, este Trabajo de Fin de Grado se enmarca dentro de los enfoques de clasificación directa. Esta decisión responde a criterios de aplicabilidad práctica y viabilidad clínica, fundamentados en tres razones principales:
+
+\begin{itemize}
+    \item \textbf{Coste de anotación:} Los modelos de segmentación requieren máscaras detalladas a nivel de píxel o vóxel, delineadas manualmente por radiólogos expertos en cada uno de los cortes bidimensionales del volumen. Este proceso supone un recurso limitado y costoso en el ámbito médico.
+    \item \textbf{Propagación del error:} En sistemas en cascada, formados por una etapa de segmentación seguida de una etapa de clasificación, cualquier imprecisión cometida al delimitar el ligamento puede trasladarse al clasificador y afectar al diagnóstico final.
+    \item \textbf{Preservación de signos indirectos de lesión:} En la práctica clínica, el estado del ligamento no se evalúa de forma aislada, sino junto con indicios periféricos relevantes, como el edema óseo por contusión (\textit{bone bruising}) en el cóndilo femoral lateral o la traslación tibial anterior. Un clasificador directo procesa el volumen completo de la articulación, permitiendo al modelo aprender estas relaciones contextuales.
+\end{itemize}
+
+Por todo ello, la comparación sistemática entre arquitecturas convolucionales y modelos basados en mecanismos de atención aplicados a la clasificación directa constituye uno de los ejes principales del debate científico actual y del presente trabajo.
+
+\subsection{El conjunto de datos MRNet como referencia}
+
+Uno de los principales hitos en este ámbito es la publicación del conjunto de datos \textit{MRNet}, desarrollado por el \textit{Stanford Machine Learning Group} en 2018 \cite{bien2018deep}, que se ha convertido en una referencia habitual para la evaluación de modelos de aprendizaje profundo aplicados al análisis de resonancias magnéticas de rodilla. Este dataset está compuesto por 1.370 estudios de RM de rodilla e incluye etiquetas para tres tareas diagnósticas: anormalidad general, lesión meniscal y rotura del ligamento cruzado anterior.
+
+Para el estudio del LCA, la serie sagital ponderada en T2 con supresión grasa resulta especialmente relevante, ya que permite visualizar con claridad la continuidad de las fibras del ligamento. No obstante, uno de los aspectos más importantes al revisar la literatura es que los protocolos de evaluación no siempre son homogéneos, lo que dificulta la comparación directa entre trabajos.
+
+En particular, conviene distinguir entre la nomenclatura empleada en el artículo original y la utilizada en el contexto competitivo asociado a MRNet. En muchos trabajos posteriores, el conjunto de validación pública se utiliza como referencia principal, mientras que el denominado \textit{hidden test set} permanece oculto y solo puede evaluarse mediante la plataforma de competición de Stanford. Como consecuencia, gran parte de los resultados reportados en la literatura corresponden a validación pública o a particiones propias definidas por los autores, y no al conjunto de test oculto.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Correspondencia entre las particiones de MRNet y su uso en el artículo original y en la competición.}
+\label{tab:mrnet_splits}
+\begin{tabularx}{\textwidth}{
+>{\raggedright\arraybackslash}X
+>{\centering\arraybackslash}m{2.1cm}
+>{\centering\arraybackslash}m{3cm}
+>{\centering\arraybackslash}m{3.4cm}
+}
+\toprule
+\textbf{Segmento} &
+\textbf{N.\textsuperscript{o} de estudios} &
+\textbf{Artículo original} &
+\textbf{Uso habitual posterior} \\
+\midrule
+Entrenamiento &
+1130 &
+\textit{Training set} &
+\textit{Training set} \\
+
+Validación pública &
+120 &
+\textit{Tuning set} &
+\textit{Validation set} \\
+
+Test oculto &
+120 &
+\textit{Validation set} &
+\textit{Hidden test set} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Esta distinción es especialmente importante desde el punto de vista metodológico, ya que un resultado obtenido sobre validación pública no debe interpretarse como directamente comparable con otro obtenido sobre el test oculto. En consecuencia, cualquier revisión del estado del arte debe considerar no solo la métrica reportada, sino también el protocolo exacto de evaluación empleado.
+
+\subsection{Primeros enfoques basados en redes convolucionales (ResNet)}
+
+El trabajo original de \textit{MRNet} supuso un punto de partida fundamental en este campo \cite{bien2018deep}. Su propuesta se basó en el uso de una arquitectura convolucional tipo AlexNet preentrenada en ImageNet, combinada con una operación de \textit{max-pooling} a través de los distintos cortes de cada estudio. Esta decisión resulta adecuada para el problema, ya que una rotura del LCA puede manifestarse únicamente en un número reducido de cortes de la secuencia completa. De este modo, la agregación por máximo permite conservar la señal de anomalía más relevante a lo largo del volumen:
+
+\begin{equation}
+y_{\text{pred}} = \max_{i \in \{1, \dots, S\}} \sigma(\mathbf{W}^T f_i + b)
+\end{equation}
+
+donde $f_i$ representa el vector de características del corte $i$ extraído por la red convolucional, $S$ es el número total de cortes del volumen, $\mathbf{W}$ y $b$ son los parámetros del clasificador final, y $\sigma$ representa la función de activación sigmoide.
+
+A partir de esta propuesta inicial, comenzaron a aparecer trabajos que exploraban arquitecturas convolucionales más profundas y eficientes, tales como la familia ResNet \cite{he2016deep} o EfficientNet. En general, las redes convolucionales poseen un fuerte \textbf{sesgo inductivo} de localidad espacial e invarianza a la traslación, lo que las hace especialmente eficaces para capturar detalles microestructurales como la textura fina, los bordes geométricos y la discontinuidad de las fibras del ligamento en cortes concretos de la imagen.
+
+Sin embargo, debido al campo receptivo limitado de las operaciones de convolución, estos enfoques siguen presentando ciertas restricciones a la hora de modelar relaciones espaciales de largo alcance o de integrar de forma global el contexto tridimensional entre cortes alejados de la articulación.
+
+\subsection{Vision Transformers (ViT)}
+
+La evolución del procesamiento de imágenes condujo posteriormente a la adopción de arquitecturas basadas en \textit{Vision Transformers} (ViT) \cite{dosovitskiy2020image}. El núcleo de estos modelos reside en el mecanismo de autoatención global de múltiples cabezas (\textit{Multi-Head Self-Attention}, MSA), el cual calcula las relaciones mutuas entre parches bidimensionales de la imagen sin depender de filtros locales:
+
+\begin{equation}
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\end{equation}
+
+donde $Q$ (consultas), $K$ (claves) y $V$ (valores) representan las proyecciones de los parches espaciales de entrada, y $d_k$ es la dimensión de las claves.
+
+La principal ventaja de ViT en la detección de lesiones del LCA es su capacidad para modelar relaciones contextuales globales de larga distancia, permitiendo asociar las características del ligamento con indicios colaterales distribuidos por toda la articulación de la rodilla \cite{dai2021transmed}.
+
+No obstante, esta flexibilidad también supone una limitación cuando se trabaja con conjuntos de datos de escala moderada como MRNet. Al carecer del sesgo inductivo de localidad propio de las CNN, un ViT puro requiere grandes volúmenes de datos para aprender por sí mismo la geometría básica de las imágenes, lo que puede favorecer el sobreajuste si no se emplea una inicialización de pesos adecuada o un preentrenamiento robusto en dominios médicos \cite{dai2021transmed}.
+
+\subsection{Swin Transformers}
+
+Para abordar los altos requerimientos de datos y el coste computacional cuadrático de la atención global de ViT, surgieron los denominados \textit{Swin Transformers} \cite{liu2021swin}. Este paradigma introduce una estrategia de autoatención basada en ventanas locales desplazadas (\textit{Shifted Window-based Self-Attention}, SW-MSA) y una topología jerárquica de tipo piramidal.
+
+En lugar de calcular la atención entre todos los parches de la imagen, el Swin Transformer restringe el cómputo de la atención dentro de ventanas locales que no se solapan, reduciendo la complejidad computacional. El desplazamiento de las ventanas en capas consecutivas permite que la información espacial fluya a través de los límites locales y se integre progresivamente.
+
+Simultáneamente, mediante capas de fusión de parches (\textit{Patch Merging}), el modelo construye mapas de características multiescala. Esto resulta especialmente útil para el problema diagnóstico del LCA: las fases tempranas de alta resolución preservan texturas de fibra fina, mientras que las etapas profundas integran una visión más global de la articulación de la rodilla. Esta combinación de propiedades lo convierte en un candidato adecuado para la clasificación directa sin segmentaciones previas.
+
+\subsection{Comparativa sistemática según protocolo de validación}
+
+A partir de la literatura científica revisada, se presenta un análisis detallado del rendimiento de diferentes modelos sobre el dataset MRNet para la detección de roturas del LCA. Con el fin de evitar comparaciones sesgadas o metodológicamente incorrectas, los resultados se han clasificado según el entorno y protocolo de evaluación empleados por cada autor.
+
+\subsubsection{Protocolo I: Validación Pública (Tuning Set)}
+
+Este protocolo evalúa el rendimiento utilizando como conjunto de test de referencia el Tuning Set oficial de 120 casos de MRNet, cuyas etiquetas son de acceso público para los desarrolladores.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\caption{Resultados bajo el Protocolo I: Validación Pública (Tuning Set de 120 estudios).}
+\label{tab:proto_1}
+\begin{tabularx}{\textwidth}{
+>{\raggedright\arraybackslash}X
+>{\centering\arraybackslash}m{0.8cm}
+>{\raggedright\arraybackslash}X
+>{\raggedright\arraybackslash}m{2.2cm}
+>{\centering\arraybackslash}m{1.1cm}
+>{\centering\arraybackslash}m{1.3cm}
+}
+\toprule
+\textbf{Modelo / Autor} &
+\textbf{Año} &
+\textbf{Arquitectura principal} &
+\textbf{Entrada} &
+\textbf{ROC-AUC} &
+\textbf{Ref.} \\
+\midrule
+MRNet (Bien et al.) &
+2018 &
+CNN (AlexNet + Max-Pooling) &
+Axial, Coronal, Sagital &
+0.965 &
+\cite{bien2018deep} \\
+
+VGG-16 Baseline &
+2020 &
+CNN (VGG-16 estándar) &
+Sagital única &
+0.871 &
+\cite{tsai2020efficiently} \\
+
+ResNet-50 Baseline &
+2020 &
+CNN (ResNet-50 estándar) &
+Sagital única &
+0.884 &
+\cite{tsai2020efficiently} \\
+
+ViT-B/16 Baseline &
+2021 &
+Vision Transformer (ViT global) &
+Sagital única &
+0.892 &
+\cite{dai2021transmed} \\
+
+Swin-T Baseline &
+2022 &
+Swin Transformer (ventanas locales) &
+Sagital única &
+0.915 &
+\cite{liu2021swin} \\
+
+ELNet (Tsai et al.) &
+2020 &
+CNN optimizada (localización multiescala) &
+Axial, Coronal, Sagital &
+0.961 &
+\cite{tsai2020efficiently} \\
+
+TransMed (Dai et al.) &
+2021 &
+Híbrido CNN (ResNet-50) + ViT &
+Axial, Coronal, Sagital &
+0.981 &
+\cite{dai2021transmed} \\
+
+MVANet (Awan et al.) &
+2022 &
+Híbrido CNN-Transformer + atención &
+Axial, Coronal, Sagital &
+0.982 &
+\cite{awan2022mvanet} \\
+
+SGNet (Wang et al.) &
+2023 &
+CNN + Selective Group Attention &
+Axial, Coronal, Sagital &
+0.975 &
+\cite{wang2023sgnet} \\
+
+Azcona et al. &
+2020 &
+CNN (ResNet-18 + pooling temporal) &
+Axial, Coronal, Sagital &
+0.934 &
+\cite{azcona2020anterior} \\
+
+Al Ghothani \& Zhang &
+2023 &
+CNN (ResNet-50 + atención CBAM) &
+Axial, Coronal, Sagital &
+0.925 &
+\cite{alghothani2023attention} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{Protocolo II: Test Oculto Oficial (Hidden Test)}
+
+El único conjunto de prueba verdaderamente ciego de MRNet es el \textit{hidden test set} de la competición oficial: 120 estudios procedentes de 113 pacientes, cuyas etiquetas permanecen retenidas en los servidores de la Universidad de Stanford. La evaluación se realiza de forma remota subiendo el código a la plataforma Codalab, que lo ejecuta sobre datos no legibles para preservar la integridad de los resultados\footnote{\url{https://stanfordmlgroup.github.io/competitions/mrnet/}}.
+
+A diferencia del resto de protocolos, la métrica del \textit{leaderboard} oficial es el \textbf{AUC promedio de las tres tareas} (anormalidad general, lesión meniscal y rotura del LCA), y no el AUC específico del LCA, por lo que sus valores no son directamente comparables con los de las demás tablas. La Tabla~\ref{tab:proto_2} recoge las puntuaciones públicas del \textit{leaderboard}.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\caption{Resultados bajo el Protocolo II: \textit{hidden test} oficial de MRNet (120 estudios). La métrica corresponde al AUC promedio de las tres tareas publicado en el \textit{leaderboard} de Codalab, no al AUC específico de la rotura del LCA.}
+\label{tab:proto_2}
+\begin{tabularx}{\textwidth}{
+>{\raggedright\arraybackslash}X
+>{\raggedright\arraybackslash}m{4cm}
+>{\centering\arraybackslash}m{2.6cm}
+}
+\toprule
+\textbf{Envío (\textit{leaderboard})} &
+\textbf{Institución} &
+\textbf{ROC-AUC (media 3 tareas)} \\
+\midrule
+mrnet-baseline & Stanford University & 0.917 \\
+dc\_baseline & Mason High & 0.911 \\
+Triple-MRNet & Investigador independiente & 0.904 \\
+IL\_baseline & Stanford Alum & 0.900 \\
+MagNet & --- & 0.860 \\
+MRPredNet & --- & 0.837 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Resulta significativo que la práctica totalidad de los trabajos publicados ---incluidos los recogidos en las tablas anteriores--- no evalúen sobre este conjunto oculto, sino sobre la validación pública o sobre particiones propias, precisamente porque las etiquetas del test oficial no son accesibles. Los propios autores de ELNet lo explicitan al señalar que el conjunto de test ``no está disponible públicamente'', motivo por el cual recurren a la validación \cite{tsai2020efficiently}. Esta limitación refuerza la necesidad de interpretar con cautela cualquier comparación entre métricas obtenidas bajo protocolos de evaluación distintos.
+
+\subsubsection{Protocolo III: Splits Propios y Validación Cruzada}
+
+Este protocolo agrupa los trabajos de autores que reformularon localmente las particiones del dataset original, por ejemplo dividiendo los 1.250 estudios de acceso público en subconjuntos de desarrollo y test propios o aplicando esquemas de validación cruzada.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\caption{Resultados bajo el Protocolo III: Particiones personalizadas de los autores.}
+\label{tab:proto_3}
+\begin{tabularx}{\textwidth}{
+>{\raggedright\arraybackslash}X
+>{\centering\arraybackslash}m{0.8cm}
+>{\raggedright\arraybackslash}X
+>{\raggedright\arraybackslash}m{2.3cm}
+>{\centering\arraybackslash}m{1.1cm}
+>{\centering\arraybackslash}m{1.3cm}
+}
+\toprule
+\textbf{Modelo / Autor} &
+\textbf{Año} &
+\textbf{Estrategia principal} &
+\textbf{Protocolo} &
+\textbf{ROC-AUC} &
+\textbf{Ref.} \\
+\midrule
+Dual-Branch EfficientNet &
+2021 &
+Fusión de ramas y atención espacial &
+Split estratificado local 80/20 &
+0.930 &
+\cite{chen2021dual} \\
+
+KneeXNet (Joshi et al.) &
+2023 &
+Red convolucional en grafo (GCN) &
+Split propio 80/10/10 &
+0.972 &
+\cite{joshi2023kneexnet} \\
+
+Adapted ResNet-50 (3D) &
+2022 &
+Operaciones convolucionales 3D &
+Split propio 70/15/15 &
+0.954 &
+\cite{martinez2022adapted} \\
+
+Adapted ResNet-50 (3D) &
+2022 &
+Operaciones convolucionales 3D &
+Validación cruzada de 5 pliegues &
+0.941 &
+\cite{martinez2022adapted} \\
+
+Weighted Multi-view CNN &
+2021 &
+Fusión ponderada multivista &
+Split local 70/10/20 &
+0.928 &
+\cite{wang2021weighted} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Síntesis y posicionamiento del presente trabajo}
+
+A partir de la revisión sistemática del estado del arte, pueden extraerse varias conclusiones metodológicas relevantes. En primer lugar, se observa un rendimiento muy competitivo en los modelos híbridos CNN-Transformer, como TransMed, que alcanza 0.981 AUC en validación pública. Este resultado evidencia el beneficio de combinar el sesgo inductivo de localidad propio de las redes convolucionales con la capacidad de los transformers para modelar dependencias globales. Sin embargo, esta mejora suele obtenerse a costa de una mayor complejidad paramétrica y de mayores requisitos computacionales.
+
+Por otra parte, se hace evidente un problema metodológico importante en la literatura: la falta de una comparación directa y homogénea bajo condiciones idénticas de entrenamiento. Muchas publicaciones incorporan técnicas de regularización, módulos atencionales o estrategias de optimización adaptadas específicamente a sus modelos, lo que dificulta determinar si las mejoras de rendimiento se deben realmente a la arquitectura base o a componentes adicionales.
+
+En este marco científico se sitúa el presente Trabajo de Fin de Grado. El objetivo se define como una evaluación comparativa, bajo un mismo entorno de entrenamiento homogéneo, de tres familias arquitectónicas representativas de la evolución reciente en visión por computador: redes convolucionales residuales (\textbf{ResNet-50}), transformers globales (\textbf{ViT-S/16}) y transformers jerárquicos de ventanas locales (\textbf{Swin-T}). Al aislar las variables de optimización y comparar estos tres enfoques de manera equivalente sobre el dataset MRNet, este trabajo busca aportar claridad sobre qué tipo de sesgo arquitectónico resulta más adecuado para el diagnóstico médico automatizado del LCA sin incurrir en costes adicionales de segmentación de imágenes.

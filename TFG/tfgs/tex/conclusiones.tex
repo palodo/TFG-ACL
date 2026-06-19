@@ -1,0 +1,41 @@
+% Contenidos del capítulo.
+% Las secciones presentadas son orientativas y no representan
+% necesariamente la organización que debe tener este capítulo.
+
+\section{Conclusiones}
+
+En este trabajo se ha diseñado, implementado y evaluado un sistema completo de aprendizaje profundo para la detección automática de roturas del ligamento cruzado anterior (LCA) en estudios de resonancia magnética de rodilla. El sistema integra un módulo propio de selección automática de cortes, tres arquitecturas representativas del estado del arte y un esquema de fusión multi-vista entre planos anatómicos. A partir de los experimentos realizados pueden extraerse las siguientes conclusiones principales.
+
+\begin{itemize}
+    \item \textbf{Viabilidad del enfoque end-to-end.} El sistema propuesto, que evita la segmentación anatómica explícita y se apoya en un selector aprendido de cortes seguido de clasificadores multi-corte con atención, alcanza un rendimiento elevado en el dominio interno de MRNet, con valores de AUC en torno a 0.95 en el conjunto de test para las tres arquitecturas.
+
+    \item \textbf{Ausencia de un ganador absoluto.} La comparación de los ensambles multi-vista no identifica una única arquitectura superior en todas las métricas. En el conjunto de test, ResNet50 obtuvo el mayor AUC (0.9545), ViT-Small la mayor exactitud, precisión, especificidad y F1-score, y Swin-Tiny la mayor sensibilidad (0.9070), detectando 39 de las 43 roturas y dejando únicamente 4 falsos negativos. Dado que en el contexto clínico un falso negativo es especialmente costoso, el comportamiento de Swin-Tiny resulta particularmente interesante para tareas de cribado.
+
+    \item \textbf{La capacidad del modelo no es el factor limitante.} Las arquitecturas compactas empleadas (ViT-Small con 22 millones de parámetros y Swin-Tiny con 27.8 millones) igualan o superan a sus variantes mayores: ViT-Small supera en test a ViT-Base (86 millones) pese a tener una cuarta parte de los parámetros, y la variante Swin-Small (49 millones) ni siquiera converge de forma estable bajo el mismo protocolo. Este resultado evidencia que, en un conjunto de datos de tamaño moderado como MRNet, aumentar la capacidad del modelo no mejora el rendimiento e incluso puede dificultar la optimización, lo que justifica el uso de arquitecturas compactas de cara a un despliegue clínico real.
+
+    \item \textbf{Importancia del análisis multi-semilla.} El uso de diez semillas independientes por arquitectura y plano puso de manifiesto una variabilidad notable entre inicializaciones, especialmente en el plano coronal. Esto confirma que, en conjuntos médicos de tamaño moderado, una única ejecución puede sobreestimar o subestimar el rendimiento real, por lo que la evaluación de la estabilidad resulta imprescindible.
+
+    \item \textbf{Utilidad de la fusión multi-vista.} La combinación de las probabilidades de los planos sagital, coronal y axial mediante promedio simple mejoró de forma consistente respecto a los modelos individuales, sin introducir parámetros adicionales ni decisiones dependientes del conjunto de test.
+
+    \item \textbf{Existencia de \textit{domain shift}.} La validación externa zero-shot sobre el conjunto de Croacia evidenció una caída clara de la sensibilidad respecto al test interno, pese a mantener un AUC razonable (Swin-Tiny alcanzó el mayor AUC externo, 0.8821). El experimento de adaptación de dominio mediante \textit{fine-tuning} mejoró moderadamente el AUC sobre el subconjunto de prueba de Croacia (de 0.9236 a 0.9362), confirmando que la calibración del punto operativo es específica de cada dominio y centro clínico.
+
+    \item \textbf{Demostrador interactivo.} Se ha desarrollado además una aplicación web que integra todo el sistema y permite cargar un estudio DICOM real, ejecutar la inferencia y visualizar mapas de explicabilidad (\textit{Grad-CAM} y atención), lo que ilustra la aplicabilidad práctica del trabajo como herramienta de apoyo al diagnóstico.
+\end{itemize}
+
+En conjunto, el trabajo confirma el potencial de las arquitecturas basadas en mecanismos de atención frente a los enfoques puramente convolucionales, y subraya la necesidad de validación externa, calibración multi-centro y ajuste de umbrales específicos por dominio antes de cualquier aplicación clínica.
+
+\section{Trabajo futuro}
+
+A partir de las limitaciones identificadas, se proponen las siguientes líneas de investigación futura:
+
+\begin{itemize}
+    \item \textbf{Calibración de probabilidades multi-centro.} Incorporar técnicas de calibración (por ejemplo, \textit{temperature scaling} o \textit{Platt scaling}) y umbrales específicos por dominio, con el objetivo de estabilizar el punto operativo clínico al cambiar de población o de protocolo de adquisición.
+
+    \item \textbf{Selección automática de cortes en el plano axial.} Extender el selector aprendido al plano axial, que actualmente emplea cortes centrales fijos, de modo que la selección sea coherente con la estrategia aplicada a los planos sagital y coronal.
+
+    \item \textbf{Validación externa más amplia y prospectiva.} Evaluar el sistema sobre conjuntos de varios centros y, preferiblemente, en un escenario prospectivo, para estimar de forma más fiable su capacidad de generalización en la práctica clínica.
+
+    \item \textbf{Modelado volumétrico y atención inter-plano.} Explorar arquitecturas 3D o mecanismos de atención que aprendan a ponderar la contribución de cada plano anatómico, en lugar del promedio simple actual, así como la extensión a otras lesiones de la rodilla (menisco, ligamento cruzado posterior, etc.).
+
+    \item \textbf{Explicabilidad validada clínicamente.} Validar cuantitativamente los mapas de saliencia y atención frente a anotaciones de especialistas, con el fin de garantizar que las regiones destacadas por el modelo se corresponden con la evidencia radiológica real.
+\end{itemize}
