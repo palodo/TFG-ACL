@@ -4,7 +4,14 @@
 
 \section{Conclusiones}
 
-En este trabajo se ha diseñado, implementado y evaluado un sistema completo de aprendizaje profundo para la detección automática de roturas del ligamento cruzado anterior (LCA) en estudios de resonancia magnética de rodilla. El sistema integra un módulo propio de selección automática de cortes, tres arquitecturas representativas del estado del arte y un esquema de fusión multi-vista entre planos anatómicos. A partir de los experimentos realizados pueden extraerse las siguientes conclusiones principales.
+En este trabajo se ha diseñado, implementado y evaluado un sistema completo de aprendizaje profundo para la detección automática de roturas del ligamento cruzado anterior (LCA) en estudios de resonancia magnética de rodilla. El sistema integra un módulo propio de selección automática de cortes, tres arquitecturas representativas del estado del arte y un esquema de fusión multi-vista entre planos anatómicos. La Figura~\ref{fig:arquitectura_conclusiones} resume la arquitectura global del sistema propuesto, desde el volumen de RM de entrada hasta la predicción final del LCA. A partir de los experimentos realizados pueden extraerse las siguientes conclusiones principales.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{figs/pipeline_general.png}
+\caption{Esquema de la arquitectura global del sistema propuesto: selección automática de cortes por plano, extracción de características mediante el \textit{backbone}, agregación de cortes mediante \textit{pooling} y fusión multi-vista de los planos sagital, coronal y axial para la predicción final de rotura del LCA.}
+\label{fig:arquitectura_conclusiones}
+\end{figure}
 
 \begin{itemize}
     \item \textbf{Viabilidad del enfoque end-to-end.} El sistema propuesto, que evita la segmentación anatómica explícita y se apoya en un selector aprendido de cortes seguido de clasificadores multi-corte con atención, alcanza un rendimiento elevado en el dominio interno de MRNet, con valores de AUC en torno a 0.95 en el conjunto de test para las tres arquitecturas.

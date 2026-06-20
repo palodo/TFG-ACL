@@ -154,7 +154,7 @@ pdfauthor=\@author}
     \bfseries{\hspace{5cm}\scshape \@authorlabel:\\ % Author
     \mbox{}\hspace{5cm}\@author}
 
-    \vspace{0.5\baselineskip} % Whitespace below the editor list
+    \vspace{1.6\baselineskip} % Whitespace below the editor list
 
     {\hspace{5cm}\scshape \@tutorlabel:\\ % Tutor
     \mbox{}\hspace{5cm}\@tutor}

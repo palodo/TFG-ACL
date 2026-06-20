@@ -233,22 +233,41 @@ S.append(slide(f"""
   </div>
 """, page=9))
 
-# 10 DECISIÓN 5 multiseed — curvas de entrenamiento + variabilidad
+# 10 — Multi-semilla: curvas reales por plano (ViT-Small) + mejor checkpoint
+def ms_slide(plane, head, note):
+    return slide(f"""
+      {kick('Estabilidad · multi-semilla')}{deci(5)}
+      <h1 class="head">{head}</h1>
+      <div class="col grow center" style="margin-top:0.6vw">
+        <img src="{IMG['ms_'+plane]}" style="width:94%;max-height:30vw;object-fit:contain;align-self:center">
+      </div>
+      <p class="sub" style="font-size:1.08vw;max-width:82vw;margin-top:0.4vw">{note}</p>
+    """, soft=True)
+
+S.append(ms_slide("sagittal","Plano sagital — 10 semillas (ViT-Small)",
+  "Convergencia limpia y AUC de validación alto (media <b style='color:#0B6E64'>0.962</b>). La pérdida de train sigue bajando cuando el early stopping ya ha guardado el mejor checkpoint por AUC."))
+S.append(ms_slide("coronal","Plano coronal — la mayor variabilidad",
+  "Aquí la <b style='color:#0B6E64'>inicialización importa mucho</b>: las semillas se dispersan (de ~0.80 a ~0.94). Es el plano más difícil y el que más regularización recibió. Justifica entrenar con 10 semillas."))
+S.append(ms_slide("axial","Plano axial — el más estable",
+  "Todas las semillas convergen casi solapadas (desviación mínima). El mapa transversal del LCA es el más informativo y reproducible."))
+
+# 13 — Mejor checkpoint por plano
 S.append(slide(f"""
-  {kick('Estabilidad')}{deci(5)}
-  <h1 class="head">10 semillas: una sola ejecución engaña</h1>
-  <div class="row" style="margin-top:1vw;align-items:center">
-    <div class="col grow center" style="padding-right:1vw">
-      <img src="{IMG['train']}" style="width:100%;max-height:34vw;object-fit:contain">
-      <div class="cap" style="text-align:left">Curvas de AUC de validación de las 10 semillas (ViT-Small)</div>
+  {kick('Estabilidad · selección final')}{deci(5)}
+  <h1 class="head">El mejor checkpoint de cada plano forma el ensamble</h1>
+  <div class="row" style="margin-top:0.5vw">
+    <div class="col grow center" style="gap:0.6vw">
+      <img src="{IMG['best_sagittal']}" style="max-height:12.5vw;width:auto;align-self:center">
+      <img src="{IMG['best_coronal']}" style="max-height:12.5vw;width:auto;align-self:center">
+      <img src="{IMG['best_axial']}" style="max-height:12.5vw;width:auto;align-self:center">
     </div>
-    <div class="col center" style="width:27vw"><ul class="b">
-      <li>Cada arquitectura/plano se entrena con <b>10 semillas</b> (42–51).</li>
-      <li>La <b>inicialización</b> cambia el resultado: el plano <b>coronal</b> se dispersa mucho entre semillas, mientras el <b>axial</b> converge estable.</li>
-      <li>Por eso reportamos <b>media ± desviación</b> y elegimos el mejor checkpoint <b>por validación</b>: una sola ejecución podría sobre- o infra-estimar el rendimiento.</li>
+    <div class="col center" style="width:25vw"><ul class="b">
+      <li>Tras las 10 semillas se fija <b>un checkpoint por plano</b>, usando solo validación.</li>
+      <li>Mejores semillas: sagital <b>43</b> · coronal <b>51</b> · axial <b>48</b>.</li>
+      <li>Estos tres modelos son los que se promedian en el <b>ensamble multi-vista</b>.</li>
     </ul></div>
   </div>
-""", page=10, soft=True))
+""", soft=True))
 
 # 11 DECISIÓN 6 umbral
 S.append(slide(f"""

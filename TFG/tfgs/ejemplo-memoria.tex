@@ -37,7 +37,7 @@
 
 % Si hay varios tutores:
 \tutorlabel{Tutores}
-\tutor{\shortstack[l]{\\[2mm] José David Martín Guerrero \\ Yolanda Vives Gilabert}}
+\tutor{\shortstack[l]{\\[2mm] José David Martín Guerrero \\[4pt] Yolanda Vives Gilabert}}
 % Si el tutor es masculino:
 % \tutorlabel{Tutor}
 %\tutorlabel{Tutora}
@@ -46,6 +46,12 @@
 
 % Editar: Poner mes y año de la convocatoria de lectura del TFM
 \convocatoria{Julio 2026}
+
+% Renombrar "Cuadro" -> "Tabla" en captions e índice
+\addto\captionsspanish{%
+  \renewcommand{\tablename}{Tabla}%
+  \renewcommand{\listtablename}{Índice de tablas}%
+}
 
 \begin{document}
 
@@ -58,7 +64,7 @@
 \cleardoublepage
 
 
-% Editar: Resumen en Español (obligatorio)
+% Editar: Resumen en Español
 \begin{resumen}
 El diagnóstico de lesiones de rodilla mediante imágenes de resonancia magnética (RM) constituye un proceso fundamental en la práctica clínica, que exige un elevado grado de especialización y un considerable consumo de tiempo por parte de los profesionales sanitarios. En este contexto, el presente trabajo aborda la aplicación de técnicas avanzadas de aprendizaje profundo con el objetivo de automatizar y optimizar la detección de patologías en imágenes médicas.
 
@@ -84,13 +90,13 @@ Finally, several future research directions are proposed to improve the robustne
 
 % Editar: Resumen en Valenciano
 \begin{resumen}
-El diagnòstic de lesions de genoll mitjançant imatges de ressonància magnètica (RM) constitueix una tasca fonamental en la pràctica clínica, que requereix un alt nivell d'especialització i un considerable consum de temps per part dels professionals sanitaris. En aquest context, el present treball aborda l'aplicació de tècniques avançades d'aprenentatge profund amb l'objectiu d'automatitzar i millorar la detecció de patologies en imatges mèdiques.
+El diagnòstic de lesions de genoll mitjançant imatges de ressonància magnètica (RM) constitueix una tasca fonamental en la pràctica clínica, que requereix un alt nivell d’especialització i un considerable consum de temps per part dels professionals sanitaris. En aquest context, el present treball aborda l’aplicació de tècniques avançades d’aprenentatge profund amb l’objectiu d’automatitzar i millorar la detecció de patologies en imatges mèdiques.
 
-Concretament, s'han implementat i avaluat tres arquitectures representatives de l'estat de l'art en visió per computador: una xarxa neuronal convolucional profunda (ResNet) i dos models basats en mecanismes d'atenció de tipus transformer (Vision Transformer i Swin Transformer). Aquests models han sigut entrenats i validats sobre un conjunt de dades d'imatges de ressonància magnètica de genoll, amb la finalitat d'analitzar la seua capacitat per identificar patrons rellevants associats a diferents tipus de lesions.
+Concretament, s’han implementat i avaluat tres arquitectures representatives de l’estat de l’art en visió per computador: una xarxa neuronal convolucional profunda (ResNet) i dos models basats en mecanismes d’atenció de tipus transformer (Vision Transformer i Swin Transformer). Aquests models han sigut entrenats i validats sobre un conjunt de dades d’imatges de ressonància magnètica de genoll, amb la finalitat d’analitzar la seua capacitat per identificar patrons rellevants associats a diferents tipus de lesions.
 
-Els resultats obtinguts permeten establir una comparació rigorosa entre els diferents enfocaments, posant de manifest les fortaleses i limitacions de cada arquitectura en termes de precisió, capacitat de generalització i eficiència computacional. Així mateix, es discuteixen les implicacions d'aquests resultats en l'àmbit clínic, així com les principals limitacions de l'estudi.
+Els resultats obtinguts permeten establir una comparació rigorosa entre els diferents enfocaments, posant de manifest les fortaleses i limitacions de cada arquitectura en termes de precisió, capacitat de generalització i eficiència computacional. Així mateix, es discuteixen les implicacions d’aquests resultats en l’àmbit clínic, així com les principals limitacions de l’estudi.
 
-Finalment, es proposen diverses línies de treball futur orientades a millorar la robustesa i l'aplicabilitat d'aquests models en entorns clínics reals. Aquest treball contribueix a l'avanç de les tècniques d'aprenentatge profund en el diagnòstic mèdic, evidenciant el potencial de les arquitectures basades en transformers enfront dels enfocaments tradicionals basats en convolucions.
+Finalment, es proposen diverses línies de treball futur orientades a millorar la robustesa i l’aplicabilitat d’aquests models en entorns clínics reals. Aquest treball contribueix a l’avanç de les tècniques d’aprenentatge profund en el diagnòstic mèdic, evidenciant el potencial de les arquitectures basades en transformers enfront dels enfocaments tradicionals basats en convolucions.
 \end{resumen}
 \cleardoublepage
 
@@ -133,10 +139,8 @@ Finalmente, quiero expresar mi más profundo agradecimiento a mi familia y seres
 \chapter{Introducción}
 \input{tex/introduccion.tex}
 
-\chapter{Materiales}
+\chapter{Materiales y Métodos}
 \input{tex/materiales.tex}
-
-\chapter{Métodos}
 \input{tex/metodologia.tex}
 
 \chapter{Resultados y Discusión}
@@ -145,21 +149,13 @@ Finalmente, quiero expresar mi más profundo agradecimiento a mi familia y seres
 \chapter{Aplicación: demostrador clínico interactivo}
 \input{tex/aplicacion.tex}
 
-\chapter{Conclusiones (obligatorio) y proyección futura. }
+\chapter{Conclusiones y proyección futura}
 \input{tex/conclusiones.tex}
 
 
 \addcontentsline{toc}{chapter}{Bibliografía}
 \bibliographystyle{unsrt}
 \bibliography{bib/bibliografia}
-
-% -------------------------------------------------------------------------
-% ANEXOS
-% -------------------------------------------------------------------------
-\appendix
-\addcontentsline{toc}{chapter}{Anexos}
-\chapter{Material complementario}
-\input{tex/anexos.tex}
 
 
 

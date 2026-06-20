@@ -16,6 +16,17 @@ Cada estudio está compuesto por tres series tridimensionales correspondientes a
     \item \textbf{Plano axial}
 \end{itemize}
 
+La Figura~\ref{fig:planos_ejemplo} muestra un ejemplo de los tres planos para un mismo estudio con rotura del LCA.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.31\textwidth}\centering\includegraphics[width=\linewidth]{figs/plano_sagital.png}\\[2pt]\small Sagital\end{minipage}\hfill
+\begin{minipage}{0.31\textwidth}\centering\includegraphics[width=\linewidth]{figs/plano_coronal.png}\\[2pt]\small Coronal\end{minipage}\hfill
+\begin{minipage}{0.31\textwidth}\centering\includegraphics[width=\linewidth]{figs/plano_axial.png}\\[2pt]\small Axial\end{minipage}
+\caption{Ejemplo de los tres planos anatómicos de un mismo estudio de RM de rodilla con rotura del LCA (MRNet).}
+\label{fig:planos_ejemplo}
+\end{figure}
+
 Con el objetivo de evitar fuga de información (\textit{data leakage}), las particiones de entrenamiento, validación y prueba se realizaron a nivel de paciente.
 
 \begin{table}[H]
@@ -85,7 +96,7 @@ Cada estudio de RM puede representarse matemáticamente como un volumen tridimen
 V \in \mathbb{R}^{S \times H \times W}
 \end{equation}
 
-donde $S$ representa el número de cortes del volumen, mientras que $H$ y $W$ corresponden a la resolución espacial de cada corte.
+\noindent donde $S$ representa el número de cortes del volumen, mientras que $H$ y $W$ corresponden a la resolución espacial de cada corte.
 
 Las intensidades de píxel fueron normalizadas mediante escalado Min-Max:
 

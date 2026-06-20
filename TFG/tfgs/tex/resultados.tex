@@ -1,95 +1,31 @@
 % -------------------------------------------------------------------------
 % RESULTADOS Y DISCUSION
 % Este archivo esta pensado para incluirse dentro del capitulo de resultados.
-% No contiene comandos \chapter ni \section, y mantiene la estructura basada
-% en \subsection y \subsubsection.
+% No contiene el comando \chapter (el capítulo se abre desde ejemplo-memoria.tex);
+% la estructura interna usa \section para cada arquitectura y \subsection para sus apartados.
 % -------------------------------------------------------------------------
-
-\subsection{Diseño experimental y criterios de evaluación clínica}
-\label{subsec:diseno_experimental_resultados}
-
-El objetivo de los experimentos fue evaluar la capacidad de distintas arquitecturas de aprendizaje profundo para detectar roturas del ligamento cruzado anterior (LCA) en estudios de resonancia magnética de rodilla. Para ello, se compararon tres familias de modelos: una red convolucional residual, \textit{ResNet50}; un transformer global, \textit{Vision Transformer Small} (ViT-Small); y un transformer jerárquico basado en ventanas desplazadas, \textit{Swin Transformer Tiny}.
-
-El entrenamiento se organizó por planos anatómicos. Se entrenaron modelos independientes para las proyecciones sagital, coronal y axial y, posteriormente, se integraron sus salidas probabilísticas en un ensamble multi-vista. Además, para cada arquitectura y plano anatómico se utilizaron diez semillas independientes, comprendidas entre la 42 y la 51, con el fin de cuantificar la estabilidad del entrenamiento.
-
-La métrica prioritaria fue la sensibilidad o \textit{recall}, ya que un falso negativo implica no detectar una lesión real. Por ello, el umbral de decisión se seleccionó en validación maximizando la sensibilidad bajo una precisión mínima de 0.75:
-
-\begin{equation}
-\tau^* =
-\operatorname*{arg\,max}_{\tau} \; \mathrm{Recall}(\tau)
-\quad
-\text{sujeto a}
-\quad
-\mathrm{Precision}(\tau) \geq 0.75 .
-\label{eq:threshold_clinico}
-\end{equation}
-
-El suelo de precisión del 0.75 actúa como salvaguarda frente a la solución trivial de clasificar todos los estudios como positivos (que maximizaría la sensibilidad a costa de una precisión inaceptable), garantizando que al menos tres de cada cuatro casos señalados como positivos correspondan a roturas reales. La calibración del umbral se realizó exclusivamente sobre validación; el conjunto de test se utilizó solo para estimar el rendimiento final bajo el punto operativo seleccionado. En la Sección~\ref{subsec:discusion_general_resultados} se analiza la robustez de este umbral.
-
-La combinación multi-vista se realizó mediante el promedio simple de las probabilidades obtenidas por los tres modelos especializados por plano:
-
-\begin{equation}
-\hat{p}_{\mathrm{ens}} =
-\frac{
-\hat{p}_{\mathrm{sagital}} +
-\hat{p}_{\mathrm{coronal}} +
-\hat{p}_{\mathrm{axial}}
-}{3}.
-\label{eq:ensemble_promedio}
-\end{equation}
-
-Este esquema de fusión no introduce parámetros adicionales y permite comparar directamente el rendimiento de modelos individuales y multi-vista.
-
-\subsubsection{Hiperparámetros relevantes del entrenamiento}
-
-En los experimentos multi-semilla se emplearon aumentos de datos, \textit{dropout}, suavizado de etiquetas cuando correspondía y \textit{early stopping} con paciencia máxima de 25 épocas.
-
-Conviene aclarar un aspecto de interpretación de las curvas de entrenamiento. El criterio de parada se basa en el AUC de \textit{validación}, no en la pérdida de entrenamiento, y el modelo conservado en cada caso es el del \textbf{mejor AUC de validación}, no el de la última época. Por ello es esperable que la pérdida de entrenamiento aún muestre margen de descenso en el punto de corte: detenerse cuando la validación deja de mejorar evita precisamente el sobreajuste que supondría prolongar el entrenamiento. Las oscilaciones residuales de las curvas de validación reflejan el tamaño reducido del conjunto (188 estudios), lo que motiva el promediado multi-semilla.
-
-El experimento de adaptación de dominio se realizó con el conjunto externo de Croacia descrito en el capítulo de materiales. En este caso, se ajustó el modelo Swin-Tiny sagital con una tasa de aprendizaje inicial de $2 \times 10^{-4}$, pérdida BCE ponderada con \texttt{pos\_weight} = 3.0314, \textit{dropout} de 0.3 en la entrada del clasificador y \textit{dropout} de 0.2 en la capa densa final.
 
 % -------------------------------------------------------------------------
 % RESULTADOS RESNET50
 % -------------------------------------------------------------------------
 
-\subsection{Resultados del modelo convolucional ResNet50}
+\section{ResNet50}
 \label{subsec:resultados_resnet50}
 
 La arquitectura convolucional \textit{ResNet50} se utilizó como referencia frente a los modelos basados en transformers.
 
-\subsubsection{Análisis de estabilidad multi-semilla}
+\subsection{Rendimiento por vista: estabilidad multi-semilla y checkpoint fijado}
 
-La Tabla~\ref{tab:multiseed_resnet50} resume la estabilidad multi-semilla de ResNet50.
+La Figura~\ref{fig:multiseed_resnet50} resume la distribución del AUC de validación de ResNet50 a lo largo de las diez semillas, para cada plano anatómico.
 
-\begin{table}[H]
+\begin{figure}[H]
 \centering
-\small
-\caption{Análisis de estabilidad multi-semilla para la arquitectura ResNet50.}
-\label{tab:multiseed_resnet50}
-\begin{tabularx}{\textwidth}{
->{\raggedright\arraybackslash}X
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
-}
-\toprule
-\textbf{Plano} &
-\textbf{AUC medio} &
-\textbf{Desv. est.} &
-\textbf{AUC mín.} &
-\textbf{AUC máx.} &
-\textbf{Mejor semilla} \\
-\midrule
-Sagital & 0.9425 & 0.0170 & 0.9132 & 0.9638 & 46 \\
-Coronal & 0.9390 & 0.0169 & 0.8973 & 0.9638 & 44 \\
-Axial   & \textbf{0.9610} & \textbf{0.0087} & \textbf{0.9501} & \textbf{0.9810} & \textbf{51} \\
-\bottomrule
-\end{tabularx}
-\end{table}
+\includegraphics[width=0.82\textwidth]{figs/outputs/CNN_boxplot.png}
+\caption{Distribución del AUC de \textbf{validación} de ResNet50 sobre las diez semillas (42--51) en cada plano anatómico. Cada punto corresponde a una semilla; la caja representa el rango intercuartílico y la línea central, la mediana.}
+\label{fig:multiseed_resnet50}
+\end{figure}
 
-El plano axial presentó simultáneamente el mayor AUC medio y la menor desviación estándar en validación, lo que indica un comportamiento particularmente estable. Los planos sagital y coronal también mostraron valores medios elevados, aunque con una variabilidad mayor entre ejecuciones. Esta diferencia refuerza la utilidad del análisis multi-semilla: una única ejecución podría sobreestimar o subestimar el rendimiento real de la arquitectura.
+El plano axial presentó simultáneamente el mayor AUC medio (0.9610) y la menor dispersión entre semillas (desviación estándar de 0.0087), lo que se traduce en una caja estrecha y un comportamiento particularmente estable. Los planos sagital y coronal también mostraron valores medios elevados (0.9425 y 0.9390), aunque con una variabilidad notablemente mayor entre ejecuciones, visible en la mayor extensión de sus cajas. Esta diferencia refuerza la utilidad del análisis multi-semilla: una única ejecución podría sobreestimar o subestimar el rendimiento real de la arquitectura.
 
 La Figura~\ref{fig:resnet_multiseed_training} muestra la evolución del entrenamiento multi-semilla de ResNet50 en los tres planos anatómicos.
 
@@ -104,12 +40,13 @@ La Figura~\ref{fig:resnet_multiseed_training} muestra la evolución del entrenam
 \vspace{0.6em}
 
 \includegraphics[width=0.88\textwidth]{figs/outputs/CNN_axial_entrenamiento_multiseed.png}
-\caption{Evolución del entrenamiento multi-semilla de ResNet50 en los planos sagital, coronal y axial.}
+\caption{Evolución del entrenamiento multi-semilla de ResNet50 en los planos sagital, coronal y axial. Cada curva muestra la pérdida de entrenamiento y de validación a lo largo de las épocas.}
 \label{fig:resnet_multiseed_training}
 \end{figure}
 
+En estas curvas, la pérdida de entrenamiento desciende de forma sostenida mientras que la de validación se estabiliza y comienza a repuntar ligeramente a partir de aproximadamente la décima época, abriendo una brecha entre ambas que es la firma característica del sobreajuste. Este comportamiento justifica la estrategia de selección por \textit{early stopping} implícito: en lugar de conservar el último estado del modelo, se fija como checkpoint el de mejor AUC de validación, anterior al punto en que la brecha se ensancha. La dispersión entre semillas es coherente con lo observado en el boxplot, siendo más acusada en los planos sagital y coronal que en el axial.
 
-\subsubsection{Rendimiento de los modelos fijados por validación por plano anatómico}
+% (fusionado en Rendimiento por vista)
 
 Tras el análisis multi-semilla, se fijó un checkpoint por plano anatómico utilizando únicamente el comportamiento observado en validación. El conjunto de test se empleó después solo como evaluación final. Estos resultados se resumen en la Tabla~\ref{tab:resnet_individual}.
 
@@ -154,14 +91,14 @@ La Figura~\ref{fig:resnet_best_training} recoge las curvas de entrenamiento de l
 \label{fig:resnet_best_training}
 \end{figure}
 
-\subsubsection{Ensamble multi-vista calibrado}
+\subsection{Ensamble multi-vista calibrado}
 
 El ensamble ResNet50 utilizó un umbral calibrado en validación de $\tau = 0.5445$. Sus métricas principales se recogen en la Tabla~\ref{tab:ensemble_resnet50_metricas}.
 
 \begin{table}[H]
 \centering
 \scriptsize
-\caption{Rendimiento del ensamble multi-vista basado en ResNet50 con umbral calibrado en validación.}
+\caption{Rendimiento del ensamble multi-vista basado en ResNet50 con umbral calibrado en validación (resultados en validación y test).}
 \label{tab:ensemble_resnet50_metricas}
 \begin{tabularx}{\textwidth}{
 >{\raggedright\arraybackslash}X
@@ -189,73 +126,34 @@ Test       & 0.9545 & 0.8556 & 0.6333 & 0.8837 & 0.8472 & 0.7379 & 0.5445 \\
 \end{tabularx}
 \end{table}
 
-\begin{table}[H]
+\begin{figure}[H]
 \centering
-\small
-\caption{Matriz de confusión del ensamble ResNet50.}
-\label{tab:ensemble_resnet50_confusion}
-\begin{tabularx}{\textwidth}{
->{\raggedright\arraybackslash}X
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
-}
-\toprule
-\textbf{Conjunto} &
-\textbf{VP} &
-\textbf{FN} &
-\textbf{FP} &
-\textbf{VN} \\
-\midrule
-Validación & 35 & 1 & 11 & 141 \\
-Test       & 38 & 5 & 22 & 122 \\
-\bottomrule
-\end{tabularx}
-\end{table}
+\includegraphics[width=0.92\textwidth]{figs/outputs/CNN_cm_grafica.png}
+\caption{Matrices de confusión del ensamble ResNet50 en validación (izquierda) y test (derecha), con el umbral clínico fijado en validación.}
+\label{fig:ensemble_resnet50_confusion}
+\end{figure}
 
-En la evaluación final sobre test de MRNet, el ensamble ResNet50 alcanzó un AUC de 0.9545. Su sensibilidad fue ligeramente inferior a la obtenida por Swin-Tiny: ResNet50 dejó 5 falsos negativos en test, frente a los 4 falsos negativos del ensamble Swin-Tiny.
+En la evaluación final sobre test de MRNet, el ensamble ResNet50 alcanzó un AUC de 0.9545. Su sensibilidad fue de 0.8837 (38 de las 43 roturas detectadas, 5 falsos negativos). La comparación entre las tres arquitecturas se aborda en la Sección~\ref{sec:comparativa_analisis}.
 
 % -------------------------------------------------------------------------
 % RESULTADOS VIT-SMALL
 % -------------------------------------------------------------------------
 
-\subsection{Resultados del modelo Vision Transformer (ViT-Small)}
+\section{ViT-Small}
 \label{subsec:resultados_vitbase}
 
 \textit{Vision Transformer Small} (ViT-Small) procesa la imagen como una secuencia de parches y emplea autoatención global, con una dimensión de \textit{embedding} de 384 y aproximadamente 22 millones de parámetros. Se adopta como representante de la familia de transformers globales por su mejor equilibrio entre rendimiento y coste; la comparación con la variante mayor ViT-Base se aborda específicamente en la Sección~\ref{subsec:efecto_tamano}.
 
-\subsubsection{Análisis de estabilidad multi-semilla}
+\subsection{Rendimiento por vista: estabilidad multi-semilla y checkpoint fijado}
 
-La Tabla~\ref{tab:multiseed_vitbase} presenta el análisis multi-semilla de ViT-Small para las diez semillas evaluadas.
+La Figura~\ref{fig:multiseed_vitbase} presenta la distribución del AUC de validación de ViT-Small a lo largo de las diez semillas, para cada plano anatómico.
 
-\begin{table}[H]
+\begin{figure}[H]
 \centering
-\small
-\caption{Análisis de estabilidad multi-semilla para la arquitectura ViT-Small.}
-\label{tab:multiseed_vitbase}
-\begin{tabularx}{\textwidth}{
->{\raggedright\arraybackslash}X
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
-}
-\toprule
-\textbf{Plano} &
-\textbf{AUC medio} &
-\textbf{Desv. est.} &
-\textbf{AUC mín.} &
-\textbf{AUC máx.} &
-\textbf{Mejor semilla} \\
-\midrule
-Sagital & 0.9621 & 0.0100 & 0.9404 & 0.9764 & 43 \\
-Coronal & 0.8740 & 0.0512 & 0.8035 & 0.9377 & 51 \\
-Axial   & 0.9525 & 0.0074 & 0.9437 & 0.9695 & 48 \\
-\bottomrule
-\end{tabularx}
-\end{table}
+\includegraphics[width=0.82\textwidth]{figs/outputs/VIT_boxplot.png}
+\caption{Distribución del AUC de \textbf{validación} de ViT-Small sobre las diez semillas (42--51) en cada plano anatómico. Cada punto corresponde a una semilla; la caja representa el rango intercuartílico y la línea central, la mediana.}
+\label{fig:multiseed_vitbase}
+\end{figure}
 
 El análisis multi-semilla evidencia una diferencia importante entre planos. Los planos axial y sagital fueron los más estables, con desviaciones estándar de 0.0074 y 0.0100 respectivamente, mientras que el plano coronal presentó una variabilidad superior (0.0512). Esta inestabilidad puede explicarse por la dificultad de localizar de forma consistente el LCA en dicha proyección, donde la estructura puede aparecer parcialmente representada y con mayor interferencia de tejidos circundantes. Aun así, esta variabilidad es notablemente menor que la observada en otras arquitecturas para el mismo plano.
 
@@ -274,11 +172,13 @@ La Figura~\ref{fig:vit_multiseed_training} muestra la evolución del entrenamien
 \vspace{0.6em}
 
 \includegraphics[width=0.88\textwidth]{figs/outputs/VIT_axial_entrenamiento_multiseed.png}
-\caption{Evolución del entrenamiento multi-semilla de ViT-Small en los planos sagital, coronal y axial.}
+\caption{Evolución del entrenamiento multi-semilla de ViT-Small en los planos sagital, coronal y axial. Cada curva muestra la pérdida de entrenamiento y de validación a lo largo de las épocas.}
 \label{fig:vit_multiseed_training}
 \end{figure}
 
-\subsubsection{Rendimiento de los modelos fijados por validación por plano anatómico}
+En los planos sagital y axial las curvas de validación son suaves y reproducibles entre semillas, con una brecha respecto a la pérdida de entrenamiento que crece de forma controlada, signo de un sobreajuste moderado bien gestionado por el \textit{early stopping}. En el plano coronal, en cambio, las trayectorias de validación se solapan de forma mucho más dispersa entre semillas y presentan oscilaciones más marcadas, lo que es coherente con la elevada desviación estándar observada en el boxplot y con la mayor dificultad de localizar el LCA en esta proyección.
+
+% (fusionado en Rendimiento por vista)
 
 Tras el análisis multi-semilla, se fijó un modelo por plano utilizando únicamente la información de validación. Posteriormente, el conjunto de test se utilizó solo para estimar el rendimiento final. Los resultados se muestran en la Tabla~\ref{tab:vit_individual}.
 
@@ -306,14 +206,14 @@ Axial   & 0.9695 & 0.9380 \\
 
 Los modelos fijados de ViT-Small alcanzaron un rendimiento competitivo en los tres planos. En validación destacaron los planos sagital y axial, mientras que las métricas de test se reportan exclusivamente como evaluación final.
 
-\subsubsection{Ensamble multi-vista calibrado}
+\subsection{Ensamble multi-vista calibrado}
 
 El ensamble ViT-Small utilizó un umbral de $\tau = 0.3804$, seleccionado en validación. La Tabla~\ref{tab:ensemble_vitbase_metricas} resume las métricas principales.
 
 \begin{table}[H]
 \centering
 \scriptsize
-\caption{Rendimiento del ensamble multi-vista basado en ViT-Small con umbral calibrado en validación.}
+\caption{Rendimiento del ensamble multi-vista basado en ViT-Small con umbral calibrado en validación (resultados en validación y test).}
 \label{tab:ensemble_vitbase_metricas}
 \begin{tabularx}{\textwidth}{
 >{\raggedright\arraybackslash}X
@@ -342,30 +242,12 @@ Test       & 0.9433 & 0.8663 & 0.6552 & 0.8837 & 0.8611 & 0.7525 & 0.3804 \\
 \end{table}
 
 
-\begin{table}[H]
+\begin{figure}[H]
 \centering
-\small
-\caption{Matriz de confusión del ensamble ViT-Small.}
-\label{tab:ensemble_vitbase_confusion}
-\begin{tabularx}{\textwidth}{
->{\raggedright\arraybackslash}X
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
-}
-\toprule
-\textbf{Conjunto} &
-\textbf{VP} &
-\textbf{FN} &
-\textbf{FP} &
-\textbf{VN} \\
-\midrule
-Validación & 36 & 0 & 12 & 140 \\
-Test       & 38 & 5 & 20 & 124 \\
-\bottomrule
-\end{tabularx}
-\end{table}
+\includegraphics[width=0.92\textwidth]{figs/outputs/VIT_cm_grafica.png}
+\caption{Matrices de confusión del ensamble ViT-Small en validación (izquierda) y test (derecha), con el umbral clínico fijado en validación.}
+\label{fig:ensemble_vitbase_confusion}
+\end{figure}
 
 En validación, el ensamble ViT-Small detectó las 36 roturas presentes sin ningún falso negativo (sensibilidad de 1.0). En la evaluación final sobre test alcanzó un AUC de 0.9433 con 5 falsos negativos, mostrando un buen equilibrio entre sensibilidad y discriminación global.
 
@@ -390,40 +272,21 @@ La Figura~\ref{fig:vit_best_training} resume las curvas de mejores checkpoints d
 % RESULTADOS SWIN-SMALL
 % -------------------------------------------------------------------------
 
-\subsection{Resultados del modelo Swin Transformer Tiny}
+\section{Swin-Tiny}
 \label{subsec:resultados_swin_small}
 
 \textit{Swin Transformer Tiny} combina atención local mediante ventanas desplazadas con una representación jerárquica.
 
-\subsubsection{Análisis de estabilidad multi-semilla}
+\subsection{Rendimiento por vista: estabilidad multi-semilla y checkpoint fijado}
 
-Al igual que en ResNet50 y ViT-Small, Swin-Tiny fue evaluado mediante diez semillas independientes por plano anatómico. La Tabla~\ref{tab:multiseed_swin_small} resume los resultados de validación por plano.
+Al igual que en ResNet50 y ViT-Small, Swin-Tiny fue evaluado mediante diez semillas independientes por plano anatómico. La Figura~\ref{fig:multiseed_swin_small} resume la distribución del AUC de validación por plano.
 
-\begin{table}[H]
+\begin{figure}[H]
 \centering
-\small
-\caption{Análisis de estabilidad multi-semilla para la arquitectura Swin-Tiny.}
-\label{tab:multiseed_swin_small}
-\begin{tabularx}{\textwidth}{
->{\raggedright\arraybackslash}X
->{\centering\arraybackslash}m{2.0cm}
->{\centering\arraybackslash}m{2.0cm}
->{\centering\arraybackslash}m{2.0cm}
->{\centering\arraybackslash}m{2.0cm}
-}
-\toprule
-\textbf{Plano} &
-\textbf{AUC medio} &
-\textbf{Desv. est.} &
-\textbf{AUC mín.} &
-\textbf{AUC máx.} \\
-\midrule
-Sagital & 0.9223 & 0.0787 & 0.7004 & 0.9649 \\
-Coronal & 0.7748 & 0.1348 & 0.5970 & 0.9684 \\
-Axial   & \textbf{0.9560} & \textbf{0.0123} & \textbf{0.9368} & \textbf{0.9722} \\
-\bottomrule
-\end{tabularx}
-\end{table}
+\includegraphics[width=0.82\textwidth]{figs/outputs/SWIN_boxplot.png}
+\caption{Distribución del AUC de \textbf{validación} de Swin-Tiny sobre las diez semillas (42--51) en cada plano anatómico. Cada punto corresponde a una semilla; la caja representa el rango intercuartílico y la línea central, la mediana. La amplitud de la caja del plano coronal evidencia la inestabilidad de esta proyección.}
+\label{fig:multiseed_swin_small}
+\end{figure}
 
 El plano axial fue el más estable, con un AUC medio de 0.9560 y una desviación estándar de 0.0123. En cambio, el plano coronal mostró la mayor variabilidad, con una desviación estándar de 0.1348 y un AUC mínimo de 0.5970, prácticamente equivalente al azar. Esto indica que, mientras algunas semillas alcanzaron un rendimiento elevado (AUC máximo de 0.9684), otras no llegaron a converger: el modelo colapsó hacia una solución trivial, próxima a predecir siempre la clase mayoritaria.
 
@@ -444,11 +307,13 @@ La Figura~\ref{fig:swin_multiseed_training} muestra la evolución del entrenamie
 \vspace{0.6em}
 
 \includegraphics[width=0.88\textwidth]{figs/outputs/SWIN_axial_entrenamiento_multiseed.png}
-\caption{Evolución del entrenamiento multi-semilla de Swin-Tiny en los planos sagital, coronal y axial.}
+\caption{Evolución del entrenamiento multi-semilla de Swin-Tiny en los planos sagital, coronal y axial. Cada curva muestra la pérdida de entrenamiento y de validación a lo largo de las épocas.}
 \label{fig:swin_multiseed_training}
 \end{figure}
 
-\subsubsection{Selección de modelos para el ensamble}
+Estas curvas hacen visible el fenómeno descrito: en el plano axial las trayectorias de validación de las distintas semillas se agrupan de forma compacta y descienden de manera estable, mientras que en el coronal aparecen semillas cuya pérdida de validación apenas mejora respecto al inicio —el modelo queda atrapado en la solución trivial— junto a otras que sí convergen. Donde la convergencia es correcta, la brecha entre entrenamiento y validación crece de forma contenida y el \textit{early stopping} fija el checkpoint antes de que el sobreajuste se acentúe; los casos no convergentes, en cambio, se descartan de forma natural al seleccionar por AUC de validación.
+
+% (fusionado en Rendimiento por vista)
 
 A partir del análisis multi-semilla se fijaron los checkpoints utilizados en cada plano anatómico para construir el ensamble, empleando únicamente información procedente de validación. De este modo, las métricas del ensamble no se presentan como una ejecución aislada, sino como el resultado de combinar modelos definidos antes de consultar el conjunto de test.
 
@@ -469,14 +334,14 @@ La Figura~\ref{fig:swin_best_training} recoge las curvas de entrenamiento de los
 \label{fig:swin_best_training}
 \end{figure}
 
-\subsubsection{Ensamble multi-vista calibrado}
+\subsection{Ensamble multi-vista calibrado}
 
 El ensamble Swin-Tiny se construyó mediante promedio simple de las probabilidades de los tres planos. El umbral seleccionado en validación fue $\tau = 0.3734$. Las métricas se presentan en la Tabla~\ref{tab:ensemble_swin_metricas}.
 
 \begin{table}[H]
 \centering
 \scriptsize
-\caption{Rendimiento del ensamble multi-vista basado en Swin-Tiny con umbral calibrado en validación.}
+\caption{Rendimiento del ensamble multi-vista basado en Swin-Tiny con umbral calibrado en validación (resultados en validación y test).}
 \label{tab:ensemble_swin_metricas}
 \begin{tabularx}{\textwidth}{
 >{\raggedright\arraybackslash}X
@@ -505,30 +370,12 @@ Test       & 0.9536 & 0.8556 & 0.6290 & 0.9070 & 0.8403 & 0.7429 & 0.3734 \\
 \end{table}
 
 
-\begin{table}[H]
+\begin{figure}[H]
 \centering
-\small
-\caption{Matriz de confusión del ensamble Swin-Tiny.}
-\label{tab:ensemble_swin_confusion}
-\begin{tabularx}{\textwidth}{
->{\raggedright\arraybackslash}X
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
-}
-\toprule
-\textbf{Conjunto} &
-\textbf{VP} &
-\textbf{FN} &
-\textbf{FP} &
-\textbf{VN} \\
-\midrule
-Validación & 35 & 1 & 11 & 141 \\
-Test       & 39 & 4 & 23 & 121 \\
-\bottomrule
-\end{tabularx}
-\end{table}
+\includegraphics[width=0.92\textwidth]{figs/outputs/SWIN_cm_grafica.png}
+\caption{Matrices de confusión del ensamble Swin-Tiny en validación (izquierda) y test (derecha), con el umbral clínico fijado en validación.}
+\label{fig:ensemble_swin_confusion}
+\end{figure}
 
 En la evaluación final sobre test, Swin-Tiny obtuvo una sensibilidad de 0.9070, detectando 39 de las 43 roturas presentes y dejando 4 falsos negativos. El coste de este punto operativo fue un aumento de los falsos positivos, con 23 controles clasificados como positivos, lo que redujo su precisión y especificidad respecto a ViT-Small.
 
@@ -538,7 +385,8 @@ Desde una perspectiva clínica, este comportamiento puede ser favorable cuando s
 % COMPARATIVA FINAL EN MRNET
 % -------------------------------------------------------------------------
 
-\subsection{Comparativa final de ensambles en MRNet}
+\section{Comparativa y análisis}
+\label{sec:comparativa_analisis}
 \label{subsec:comparativa_final_mrnet}
 
 La comparación entre ensambles debe interpretarse separando dos niveles. En primer lugar, la Tabla~\ref{tab:comparativa_ensembles_mrnet_val} resume el rendimiento en validación, que es el conjunto utilizado para fijar los umbrales y describir el comportamiento operativo esperado. En segundo lugar, la Tabla~\ref{tab:comparativa_ensembles_mrnet_test} muestra la evaluación final sobre el conjunto de test de MRNet, utilizado únicamente para estimar la capacidad de generalización bajo las decisiones previamente fijadas.
@@ -705,7 +553,7 @@ En consecuencia, no se propone una selección definitiva de un único modelo a p
 % FALSOS NEGATIVOS COMUNES
 % -------------------------------------------------------------------------
 
-\subsection{Análisis de los falsos negativos comunes a las tres arquitecturas}
+\subsection{Análisis de los falsos negativos comunes}
 \label{subsec:falsos_negativos_comunes}
 
 Un falso negativo, es decir, un estudio con rotura real del LCA clasificado como sano, constituye el error más relevante en este dominio clínico, pues implica no detectar una lesión presente. Para comprender la naturaleza de los errores residuales del sistema se analizaron los falsos negativos compartidos por las tres arquitecturas, bajo la hipótesis de que un caso que los tres modelos ---entrenados de forma independiente y con \textit{backbones} de naturaleza muy distinta--- clasifican erróneamente en el mismo sentido difícilmente se explica por una limitación particular de una arquitectura concreta.
@@ -742,12 +590,12 @@ Para cuantificar el impacto de estos tres casos, se recalculó el AUC de test ba
 
 Conviene además señalar que este análisis se ha limitado al conjunto de test. Un examen análogo de los casos del conjunto de validación sería igualmente pertinente, puesto que es sobre ese conjunto donde se calibra el umbral de decisión $\tau^*$ (Ecuación~\ref{eq:threshold_clinico}). La presencia de estudios ambiguos o potencialmente mal etiquetados en validación no solo alteraría sus propias métricas, sino que desplazaría el punto operativo seleccionado y, en consecuencia, las predicciones finales sobre el conjunto de test. Por ello, una revisión clínica de los casos límite debería abarcar ambos conjuntos.
 
-La Figura~\ref{fig:fn_comunes} muestra, para cada uno de estos tres casos, los cortes sagitales seleccionados por el sistema. La inspección visual resulta compatible con la dificultad observada: en los casos 0080 y 0521 no se aprecia una discontinuidad clara del ligamento en los cortes analizados, mientras que en el caso 0087 la región presenta una mayor ambigüedad. No obstante, esta valoración debe tomarse con cautela, ya que su confirmación exigiría la lectura por parte de un radiólogo especialista. Este análisis sugiere que parte de los errores residuales del sistema podrían estar vinculados a la propia ambigüedad de las imágenes o a posibles inconsistencias en el etiquetado de origen, fenómeno bien documentado en la literatura debido a la variabilidad inter-observador en la valoración radiológica del LCA. En cualquier caso, no es posible afirmar con certeza que se trate de etiquetas incorrectas sin una revisión clínica independiente, por lo que estos tres casos se reportan como ejemplo ilustrativo del tipo de error residual del sistema y no como una corrección del conjunto de prueba.
+Para localizar la región en la que el sistema fija su atención, la Figura~\ref{fig:fn_comunes} señala con un círculo, sobre los cortes sagitales seleccionados de cada caso, la región de mayor saliencia por gradiente (\textit{Grad-CAM} de entrada) del modelo Swin-Tiny, sin ocultar la anatomía subyacente. En los tres estudios la saliencia se concentra de forma coherente en la escotadura intercondílea ---la región anatómica donde se localiza el LCA---, lo que confirma que el error no se debe a que el modelo mire una zona equivocada, sino a que la evidencia visual de rotura presente en esa región es escasa o ambigua. La inspección resulta así compatible con la dificultad observada: en los casos 0080 y 0521 no se aprecia una discontinuidad clara del ligamento en los cortes analizados, mientras que en el caso 0087 la región presenta una mayor ambigüedad. No obstante, esta valoración debe tomarse con cautela, ya que su confirmación exigiría la lectura por parte de un radiólogo especialista. Este análisis sugiere que parte de los errores residuales del sistema podrían estar vinculados a la propia ambigüedad de las imágenes o a posibles inconsistencias en el etiquetado de origen, fenómeno bien documentado en la literatura debido a la variabilidad inter-observador en la valoración radiológica del LCA. En cualquier caso, no es posible afirmar con certeza que se trate de etiquetas incorrectas sin una revisión clínica independiente, por lo que estos tres casos se reportan como ejemplo ilustrativo del tipo de error residual del sistema y no como una corrección del conjunto de prueba.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{figs/outputs/fn_comunes_sagital.png}
-\caption{Cortes sagitales seleccionados por el sistema para los tres falsos negativos comunes del conjunto de test (casos 0080, 0087 y 0521). En los tres estudios la etiqueta real es rotura del LCA y las tres arquitecturas predijeron ausencia de rotura.}
+\includegraphics[width=\textwidth]{figs/outputs/fn_comunes_sagital_gradcam.png}
+\caption{Región de mayor saliencia por gradiente (\textit{Grad-CAM} de entrada) del modelo Swin-Tiny sagital sobre los cortes más atendidos de los tres falsos negativos comunes del conjunto de test (casos 0080, 0087 y 0521). El círculo marca la zona que más influye en la predicción, dejando visible la anatomía; en los tres estudios la etiqueta real es rotura del LCA. La saliencia se concentra en la región intercondílea, donde se localiza el ligamento.}
 \label{fig:fn_comunes}
 \end{figure}
 
@@ -755,17 +603,19 @@ La Figura~\ref{fig:fn_comunes} muestra, para cada uno de estos tres casos, los c
 % VALIDACION EXTERNA CROACIA
 % -------------------------------------------------------------------------
 
-\subsection{Validación externa zero-shot en el conjunto de datos de Croacia}
+\section{Validación externa}
+
+\subsection{Transferencia directa (zero-shot)}
 \label{subsec:validacion_externa_croacia}
 
 La generalización externa se evaluó en el conjunto de Croacia descrito en el capítulo de materiales. La evaluación se realizó en el plano sagital y sin entrenamiento adicional, por lo que corresponde a un escenario \textit{zero-shot}.
 
-Las métricas principales se presentan en la Tabla~\ref{tab:croacia_metricas} y las matrices de confusión correspondientes en la Tabla~\ref{tab:croacia_confusion}.
+Las métricas principales se presentan en la Tabla~\ref{tab:croacia_metricas} y las matrices de confusión correspondientes en la Figura~\ref{fig:croacia_confusion}.
 
 \begin{table}[H]
 \centering
 \scriptsize
-\caption{Validación externa zero-shot en el conjunto de datos de Croacia.}
+\caption{Validación externa \textit{zero-shot} sobre el test del conjunto de Croacia (sin reajuste de pesos).}
 \label{tab:croacia_metricas}
 \begin{tabularx}{\textwidth}{
 >{\raggedright\arraybackslash}X
@@ -792,31 +642,12 @@ Swin-Tiny & \textbf{0.8821} & 0.8659 & 0.8377 & 0.5683 & 0.9638 & 0.6772 \\
 \end{tabularx}
 \end{table}
 
-\begin{table}[H]
+\begin{figure}[H]
 \centering
-\small
-\caption{Matrices de confusión en la validación externa de Croacia.}
-\label{tab:croacia_confusion}
-\begin{tabularx}{\textwidth}{
->{\raggedright\arraybackslash}X
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
->{\centering\arraybackslash}m{1.8cm}
-}
-\toprule
-\textbf{Modelo} &
-\textbf{VP} &
-\textbf{FN} &
-\textbf{FP} &
-\textbf{VN} \\
-\midrule
-ResNet50   & 127 & 100 & 19 & 671 \\
-ViT-Small  & 155 & 72  & 70 & 620 \\
-Swin-Tiny & 129 & 98  & 25 & 665 \\
-\bottomrule
-\end{tabularx}
-\end{table}
+\includegraphics[width=\textwidth]{figs/outputs/CROACIA_cm_grafica.png}
+\caption{Matrices de confusión de los tres modelos en la validación externa \textit{zero-shot} (test del conjunto de Croacia, plano sagital, sin reajuste de pesos). VN: verdadero negativo; FP: falso positivo; FN: falso negativo; VP: verdadero positivo.}
+\label{fig:croacia_confusion}
+\end{figure}
 
 Los resultados evidencian un cambio de dominio relevante entre MRNet y el conjunto de Croacia. Todos los modelos reducen su sensibilidad en la validación externa, lo que indica que las diferencias de adquisición, población, escáner o protocolo pueden afectar al punto operativo aprendido en el dominio original.
 
@@ -826,7 +657,7 @@ En la evaluación externa, Swin-Tiny obtuvo el mayor AUC, con 0.8821, mientras q
 % FINE-TUNING CROACIA
 % -------------------------------------------------------------------------
 
-\subsection{Adaptación de dominio mediante fine-tuning en Croacia}
+\subsection{Adaptación de dominio (fine-tuning)}
 \label{subsec:fine_tuning_croacia}
 
 Para analizar la adaptación al nuevo dominio, se realizó \textit{fine-tuning} sobre el conjunto de Croacia.
@@ -859,11 +690,15 @@ Tras el \textit{fine-tuning}, el AUC sobre el test de Croacia aumentó de 0.9236
 
 Las curvas asociadas al ajuste fino no se incorporan como figuras principales porque la conclusión relevante queda resumida por la comparación antes/después del AUC. Su función es comprobar la dinámica de entrenamiento y la ausencia de inestabilidades evidentes, por lo que se consideran material complementario.
 
+\subsection{Prueba ilustrativa sobre estudios propios}
+
+Más allá de la evaluación cuantitativa sobre los conjuntos públicos, el sistema se sometió a una prueba cualitativa adicional sobre estudios de resonancia magnética de rodilla de adquisición propia, completamente ajenos a los datos empleados durante el desarrollo. En esta prueba informal, el sistema produjo predicciones coherentes con el estado real de las articulaciones analizadas. Aunque por su carácter anecdótico y su tamaño muestral no constituye una validación estadística, este ensayo resulta ilustrativo de la aplicabilidad del sistema sobre datos completamente nuevos y refuerza, desde un punto de vista cualitativo, la robustez observada en la validación externa.
+
 % -------------------------------------------------------------------------
 % EFECTO DEL TAMAÑO DEL MODELO
 % -------------------------------------------------------------------------
 
-\subsection{Efecto del tamaño del modelo}
+\section{Efecto del tamaño del modelo}
 \label{subsec:efecto_tamano}
 
 Una decisión metodológica relevante de este trabajo es el uso de arquitecturas compactas (del orden de 22 a 28 millones de parámetros) en lugar de sus variantes mayores. Para justificarla se entrenaron, bajo el mismo protocolo multi-semilla y el mismo \textit{pipeline}, las variantes de mayor capacidad de cada familia de transformers y se compararon con las versiones compactas empleadas como modelos principales. La Tabla~\ref{tab:efecto_tamano} resume el resultado.
@@ -902,7 +737,7 @@ Estos resultados indican que, en un conjunto de datos de tamaño moderado como M
 % DISCUSION GENERAL
 % -------------------------------------------------------------------------
 
-\subsection{Discusión general de los resultados}
+\section{Discusión final}
 \label{subsec:discusion_general_resultados}
 
 Los experimentos muestran, en primer lugar, que el análisis multi-semilla es necesario en datasets médicos de tamaño moderado, ya que la inicialización puede afectar al rendimiento final. También confirman la utilidad de integrar información multi-vista: las tres arquitecturas obtuvieron resultados competitivos al combinar las probabilidades de los planos sagital, coronal y axial.

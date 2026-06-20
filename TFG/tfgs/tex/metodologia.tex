@@ -72,6 +72,8 @@ La configuración final utilizada fue:
     \item Plano axial: $K=10$ cortes centrales consecutivos.
 \end{itemize}
 
+Esta configuración se determinó de forma empírica sobre el conjunto de validación. Para el número de cortes $K$ se probaron valores en el rango de 3 a 15 por plano, observándose que valores bajos descartaban cortes con información útil y valores altos reintroducían ruido y redundancia sin mejorar el AUC; $K=5$ (sagital) y $K=10$ (coronal y axial) ofrecieron el mejor compromiso. En cuanto a la estrategia, la selección \textit{CNN-Based} superó de forma consistente a las alternativas \textit{Center} y \textit{Random} en los planos sagital y coronal, donde el LCA aparece de forma localizada. En el plano axial, en cambio, el selector aprendido no aportó mejora —al tratarse de un corte transversal el ligamento es visible de forma más homogénea a lo largo del volumen—, por lo que se optó por la selección geométrica de cortes centrales, más simple y reproducible.
+
 \section{Arquitecturas de aprendizaje profundo}
 
 Con el objetivo de comparar distintos paradigmas de visión por computador, se seleccionaron arquitecturas representativas tanto de redes convolucionales como de Vision Transformers.
@@ -108,7 +110,9 @@ Transformer jerárquico &
 \end{tabularx}
 \end{table}
 
-Todas las arquitecturas comparten una misma cabeza de clasificación multi-corte: cada uno de los $K$ cortes seleccionados se procesa de forma independiente por el \textit{backbone} correspondiente, y los vectores de características resultantes se combinan mediante un mecanismo de \textit{Attention Pooling} que aprende a ponderar la importancia relativa de cada corte, produciendo un único vector de características ponderado para la clasificación. Por estar las tres arquitecturas diseñadas originalmente para imágenes bidimensionales, todas adoptan esta misma estrategia multi-corte para adaptarse al análisis volumétrico de la RM.
+Todas las arquitecturas comparten una misma cabeza de clasificación multi-corte: cada uno de los $K$ cortes seleccionados se procesa de forma independiente por el \textit{backbone} correspondiente, y los vectores de características resultantes se combinan mediante un mecanismo de agrupación (\textit{pooling}) que produce un único vector ponderado para la clasificación. Por estar las tres arquitecturas diseñadas originalmente para imágenes bidimensionales, todas adoptan esta misma estrategia multi-corte para adaptarse al análisis volumétrico de la RM.
+
+El tipo de \textit{pooling} se seleccionó por plano en función del AUC de validación, obteniéndose el mismo patrón en las tres arquitecturas: \textbf{Attention Pooling} en los planos sagital y axial, y \textbf{Max Pooling} en el coronal. La interpretación es coherente con la anatomía: en sagital y axial el LCA puede ser visible en varios de los cortes seleccionados, por lo que conviene que la red aprenda a \textit{ponderar} la contribución de cada uno (atención); en el plano coronal, en cambio, la señal de rotura tiende a concentrarse en muy pocos cortes, de modo que quedarse con el corte de máxima evidencia (\textit{Max Pooling}) resultó más robusto y evitó diluir esa señal al promediarla con cortes poco informativos.
 
 \section{Protocolo de entrenamiento y regularización}
 \label{sec:protocolo_entrenamiento}
@@ -116,6 +120,8 @@ Todas las arquitecturas comparten una misma cabeza de clasificación multi-corte
 Las tres arquitecturas se entrenaron bajo un mismo protocolo, ajustando únicamente los valores específicos de cada modelo y plano anatómico. En todos los casos se empleó el optimizador \textbf{AdamW} con una fase inicial de calentamiento progresivo (\textit{warmup}) y un planificador dinámico de la tasa de aprendizaje ---por reducción ante meseta (\textit{ReduceLROnPlateau}) o por decaimiento tipo \textit{Cosine Annealing}, según la arquitectura---. Para estabilizar la optimización se aplicó recorte de gradientes (\textit{Gradient Clipping}) en los planos más propensos a oscilaciones.
 
 Como técnicas de regularización comunes se utilizaron \textit{Dropout} (sobre la proyección de entrada del clasificador y sobre las capas densas), \textit{Label Smoothing} para evitar predicciones excesivamente confiadas y \textit{Early Stopping} monitorizando el AUC de validación. Estos parámetros se ajustaron de forma independiente para cada arquitectura y plano anatómico, en función de su sensibilidad al sobreajuste; los valores concretos se detallan en las tablas de cada modelo.
+
+Los valores de las Tablas~\ref{tab:regularizacion_cnn}, \ref{tab:regularizacion_vit} y \ref{tab:regularizacion_swin} no se fijaron de antemano, sino que se obtuvieron mediante una \textbf{búsqueda manual guiada} (\textit{coarse-to-fine}) sobre el conjunto de validación: partiendo de valores de referencia habituales para cada familia, se exploraron rangos de \textit{dropout} ($0.0$–$0.5$), \textit{label smoothing} ($0.0$–$0.25$) y paciencia de \textit{early stopping} ($10$–$40$ épocas), reteniendo en cada caso la combinación con mejor AUC de validación. No se empleó una búsqueda exhaustiva en rejilla por su elevado coste computacional (tres arquitecturas $\times$ tres planos $\times$ diez semillas); la exploración se concentró en los planos más inestables, especialmente el coronal.
 
 \section{Redes Convolucionales}
 \label{sec:redes_convolucionales}
@@ -129,7 +135,7 @@ El modelo \textit{Residual Network 50} (ResNet50) \cite{he2016deep} representa l
 y = \mathcal{F}(x, \{W_i\}) + x
 \end{equation}
 
-donde $x$ e $y$ representan los vectores de entrada y salida del bloque residual, mientras que $\mathcal{F}$ corresponde al mapeo residual aprendido por las capas convolucionales.
+\noindent donde $x$ e $y$ representan los vectores de entrada y salida del bloque residual, mientras que $\mathcal{F}$ corresponde al mapeo residual aprendido por las capas convolucionales.
 
 A diferencia de los modelos basados en Transformers, las redes convolucionales explotan de forma natural los sesgos inductivos de localidad espacial e invarianza a la traslación mediante el uso de filtros convolucionales compartidos. Esta propiedad las hace especialmente eficaces para detectar:
 \begin{itemize}
@@ -206,7 +212,7 @@ Cada parche es proyectado posteriormente a un espacio de embeddings y procesado 
 \right)V
 \end{equation}
 
-donde $Q$, $K$ y $V$ representan las matrices de consultas, claves y valores.
+\noindent donde $Q$, $K$ y $V$ representan las matrices de consultas, claves y valores.
 
 A diferencia de las redes convolucionales, el ViT permite modelar relaciones espaciales globales entre regiones anatómicas alejadas de la imagen mediante mecanismos de autoatención multi-cabeza (\textit{Multi-Head Self-Attention}, MHSA).
 
@@ -276,9 +282,16 @@ El mecanismo de atención puede expresarse como:
 \right)V
 \end{equation}
 
-donde $B$ representa una matriz de sesgo de posición relativa que codifica la distancia espacial entre los parches dentro de cada ventana.
+\noindent donde $B$ representa una matriz de sesgo de posición relativa que codifica la distancia espacial entre los parches dentro de cada ventana.
 
-Mediante la estrategia de ventanas desplazadas, el modelo permite el intercambio progresivo de información contextual entre regiones vecinas de la imagen, combinando eficiencia computacional y capacidad de representación multiescala.
+Mediante la estrategia de ventanas desplazadas, el modelo permite el intercambio progresivo de información contextual entre regiones vecinas de la imagen, combinando eficiencia computacional y capacidad de representación multiescala. La Figura~\ref{fig:swin_schema} resume su arquitectura jerárquica.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figs/swin_schema.png}
+\caption{Arquitectura jerárquica de Swin-Tiny: tras la partición en parches, cuatro etapas reducen progresivamente la resolución (\textit{Patch Merging}) y aumentan la dimensión de los canales. Los bloques alternan atención por ventanas locales (W-MSA) y por ventanas desplazadas (SW-MSA), que permiten el intercambio de información entre ventanas vecinas.}
+\label{fig:swin_schema}
+\end{figure}
 
 \subsubsection{Configuración y entrenamiento}
 
@@ -322,6 +335,85 @@ Axial &
 0.05 &
 30 épocas \\
 
+\bottomrule
+\end{tabularx}
+\end{table}
+\section{Diseño experimental y evaluación}
+\label{sec:diseno_experimental}
+
+El objetivo de los experimentos es comparar, en igualdad de condiciones, las tres familias de modelos —\textit{ResNet50}, \textit{ViT-Small} y \textit{Swin-Tiny}— en la detección de roturas del LCA. Para cada arquitectura se sigue el mismo protocolo experimental:
+
+\begin{enumerate}
+    \item \textbf{Entrenamiento por plano y estudio multi-semilla.} Se entrena un modelo independiente para cada plano (sagital, coronal y axial) y, para cada uno, se repite el entrenamiento con \textbf{diez semillas} independientes (42--51) con el fin de cuantificar la estabilidad frente a la inicialización.
+    \item \textbf{Fijación del checkpoint.} Para cada plano se selecciona el \textit{checkpoint} de la semilla con mejor AUC de validación.
+    \item \textbf{Métricas por plano.} Con ese modelo fijado se calculan las métricas en validación y en test.
+    \item \textbf{Ensamble multi-vista.} Se construye el ensamble combinando las probabilidades de los tres planos (Ecuación~\ref{eq:ensemble_promedio}) y se calibra su umbral de decisión sobre validación (Ecuación~\ref{eq:threshold_clinico}).
+    \item \textbf{Evaluación final.} El ensamble se evalúa una única vez sobre el conjunto de test, que no interviene en ninguna decisión previa.
+\end{enumerate}
+
+La métrica prioritaria es la sensibilidad o \textit{recall}, ya que un falso negativo implica no detectar una lesión real. Por ello, el umbral de decisión se selecciona en validación maximizando la sensibilidad bajo una precisión mínima de 0.75:
+
+\begin{equation}
+\tau^* = \operatorname*{arg\,max}_{\tau} \; \mathrm{Recall}(\tau)
+\quad \text{sujeto a} \quad \mathrm{Precision}(\tau) \geq 0.75 .
+\label{eq:threshold_clinico}
+\end{equation}
+
+El suelo de precisión del 0.75 actúa como salvaguarda frente a la solución trivial de clasificar todos los estudios como positivos. La calibración del umbral se realiza exclusivamente sobre validación; el conjunto de test se reserva para la estimación final.
+
+La combinación multi-vista se realiza mediante el promedio simple de las probabilidades de los tres planos:
+
+\begin{equation}
+\hat{p}_{\mathrm{ens}} = \frac{\hat{p}_{\mathrm{sagital}} + \hat{p}_{\mathrm{coronal}} + \hat{p}_{\mathrm{axial}}}{3}.
+\label{eq:ensemble_promedio}
+\end{equation}
+
+Este esquema no introduce parámetros adicionales. Se exploraron además otras estrategias de fusión —votación por máximo y promedio ponderado por el AUC de validación de cada plano—, pero ofrecieron resultados próximos al promedio simple sin una mejora consistente, por lo que se mantuvo este último por su simplicidad e interpretabilidad.
+
+\subsection{Métricas de evaluación}
+
+El rendimiento se cuantifica con métricas estándar de clasificación binaria. El \textbf{AUC} (área bajo la curva ROC) mide la capacidad discriminativa de forma independiente del umbral. Bajo el umbral calibrado se reportan, a partir de los verdaderos/falsos positivos y negativos (VP, FP, VN, FN):
+
+\begin{itemize}
+    \item \textbf{Exactitud} (\textit{accuracy}): $(\mathrm{VP}+\mathrm{VN})/N$.
+    \item \textbf{Sensibilidad} (\textit{recall}): $\mathrm{VP}/(\mathrm{VP}+\mathrm{FN})$ ---la métrica clínica prioritaria---.
+    \item \textbf{Especificidad}: $\mathrm{VN}/(\mathrm{VN}+\mathrm{FP})$.
+    \item \textbf{Precisión}: $\mathrm{VP}/(\mathrm{VP}+\mathrm{FP})$.
+    \item \textbf{F1-score}: media armónica de precisión y sensibilidad.
+\end{itemize}
+
+Adicionalmente se presentan las \textbf{matrices de confusión}, que desglosan los aciertos y errores por clase y resultan especialmente informativas para valorar el coste clínico de los falsos negativos.
+
+\subsection{Interpretación de las curvas de entrenamiento}
+
+El criterio de parada se basa en el AUC de \textit{validación}, no en la pérdida de entrenamiento, y el modelo conservado es el del \textbf{mejor AUC de validación}, no el de la última época. Por ello es esperable que la pérdida de entrenamiento aún muestre margen de descenso en el punto de corte: detenerse cuando la validación deja de mejorar evita precisamente el sobreajuste que supondría prolongar el entrenamiento. Las oscilaciones residuales de las curvas de validación reflejan el tamaño reducido del conjunto (188 estudios), lo que motiva el promediado multi-semilla.
+
+\section{Entorno, reproducibilidad y recursos}
+\label{sec:entorno}
+
+Todos los experimentos se implementaron en Python utilizando \textit{PyTorch} como marco de aprendizaje profundo, junto con las bibliotecas \texttt{timm} y \texttt{transformers} para la carga de los \textit{backbones} preentrenados. El entrenamiento se realizó sobre unidades de procesamiento gráfico (GPU) con aceleración CUDA.
+
+Para garantizar la reproducibilidad se fijaron de forma explícita las semillas de los generadores de números aleatorios de PyTorch y NumPy, y se habilitó el modo determinista de cuDNN. La selección de cortes se precalculó y almacenó en caché, de modo que el selector MobileNetV2 no se ejecuta en cada iteración y todos los modelos se entrenan exactamente sobre los mismos cortes.
+
+Los aumentos de datos se aplicaron únicamente sobre el conjunto de entrenamiento, ajustando su intensidad por plano y arquitectura (Tabla~\ref{tab:augmentation}). El modo \textit{conservador} aplica rotaciones y traslaciones pequeñas; el \textit{moderado} añade volteos horizontales, variaciones de brillo/contraste y transformaciones afines suaves; y el \textit{agresivo} incorpora además rotaciones más amplias, distorsiones de perspectiva y mayores variaciones fotométricas.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Intensidad de los aumentos de datos aplicados por arquitectura y plano anatómico (solo en entrenamiento).}
+\label{tab:augmentation}
+\begin{tabularx}{\textwidth}{
+>{\raggedright\arraybackslash}X
+>{\centering\arraybackslash}m{2.6cm}
+>{\centering\arraybackslash}m{2.6cm}
+>{\centering\arraybackslash}m{2.6cm}
+}
+\toprule
+\textbf{Arquitectura} & \textbf{Sagital} & \textbf{Coronal} & \textbf{Axial} \\
+\midrule
+ResNet50   & Agresivo    & Moderado & Agresivo \\
+ViT-Small  & Conservador & Moderado & Agresivo \\
+Swin-Tiny  & Agresivo    & Agresivo & Agresivo \\
 \bottomrule
 \end{tabularx}
 \end{table}
