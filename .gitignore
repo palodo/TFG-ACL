@@ -80,7 +80,7 @@ Thumbs.db
 data
 
 # Patient volumes and cache/uploads
-final_model/patient_volume/
+integracion/patient_volume/*.npy
 app/uploads/
 *.npy
 node_modules/

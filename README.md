@@ -61,10 +61,11 @@ dominio. El detalle está en la memoria.
 
 - `src/` — código compartido: arquitecturas (`models.py`), carga de datos, utilidades de
   entrenamiento.
-- `experiments/` — notebooks de entrenamiento por arquitectura (cnn, vit, vit_small, vit_tiny,
-  swin_tiny, swin_small, swin_base, convnext), incluyendo los multiseed.
-- `pipeline/` — pipeline final integrado: ensamble y calibración de umbral, inferencia desde DICOM,
-  mapas de atención.
+- `experiments/` — notebooks por arquitectura (cnn, vit, vit_small, vit_tiny, swin_tiny, swin_small,
+  swin_base, convnext): entrenamiento de una y de diez semillas y, en los modelos principales, el
+  notebook de ensamble y umbral con validación externa.
+- `integracion/` — notebooks transversales: comparación de modelos, inferencia desde DICOM y mapas de
+  explicabilidad.
 - `data_prep/` — preparación de los datos externos de Croacia.
 - `analysis/` — notebooks de análisis transversal (pipeline optimizado, falsos negativos,
   predicción desde DICOM).
