@@ -26,8 +26,8 @@ familias:
 - `vit/` — ViT-Base (86 M) y sus utilidades de atención.
 - `vit_tiny/` — ViT-Tiny.
 - `swin_base/` — Swin-Base.
-- `swin_small/` — incluye la variante Swin-Small auténtica (49 M), que no converge de forma estable
-  bajo el mismo protocolo (`swin_SMALL_REAL_multiseed.ipynb`).
+- `swin_small/` — la variante Swin-Small auténtica (49 M), que no converge de forma estable bajo el
+  mismo protocolo.
 - `convnext/` — ConvNeXt, como referencia convolucional adicional.
 
 ## Estructura común de un notebook

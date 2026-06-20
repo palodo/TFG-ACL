@@ -135,7 +135,7 @@ K=10 coronal (CNN-based), K=10 axial (cortes centrales). Coincide con el código
   (`src/models.py`, feature_dim **768**). Existe una clase `SwinBaseMultiSliceClassifier`
   (1024-dim) pero **no es la que se usa** en el modelo final ni en la app.
 - Verificación directa sobre el checkpoint final
-  (`checkpoints/swin_small_multiseed/best_sagittal_multiseed_final.pth`):
+  (`checkpoints/swin_tiny_multiseed/best_sagittal_multiseed_final.pth`):
   - `embed_dim = 96`, profundidades por etapa **[2, 2, 6, 2]**, **27.8 M** parámetros.
   - Swin-**Tiny** = depths [2,2,6,2], embed 96, ≈28 M. Swin-**Small** = depths [2,2,18,2], ≈50 M.
   - Es inequívocamente **Swin-Tiny**.
@@ -151,7 +151,7 @@ K=10 coronal (CNN-based), K=10 axial (cortes centrales). Coincide con el código
 
 **Bien en 3.6:** la descripción conceptual del shifted-window attention, el sesgo de posición
 relativa B, el Patch Merging jerárquico y el pooling por atención en los 3 planos son correctos y
-coinciden con `PLANE_CONFIG` de `swin_small_multiseed` (los 3 planos usan attention).
+coinciden con `PLANE_CONFIG` de `swin_tiny_multiseed` (los 3 planos usan attention).
 
 **Detalle de entrenamiento Swin que sí coincide:** AdamW, lr inicial 1.3e-4, ReduceLROnPlateau
 factor 0.5, grad clipping norma 1.0, dropout axial input 0.0. Tabla 3.4 (0.42/0.42/0.00 input,

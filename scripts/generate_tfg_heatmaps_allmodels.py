@@ -15,7 +15,7 @@ interpretabilidad que la app aplica realmente:
 Se muestran los mismos 5 cortes sagitales del mismo caso de validacion para las
 tres arquitecturas. Se ejecuta en CPU para no interferir con entrenamientos.
 
-Salida (en TFG/tfgs/figs/outputs/):
+Salida (en memoria/tfgs/figs/outputs/):
   - explicabilidad_3modelos_sagital.png
 """
 
@@ -68,7 +68,7 @@ model_transform = transforms.Compose([
 MODELS = [
     ('ResNet50\n(Grad-CAM)',  CNNMultiSliceClassifier,  f'cnn_multiseed_resnet50/best_{PLANE}_multiseed_final.pth', generate_saliency_overlay, False),
     ('ViT-Small\n(atención)', ViTSmallMultiSliceClassifier, f'vit_small_multiseed/seed_43/best_{PLANE}_seed43_auc.pth', generate_vit_attention_overlay, True),
-    ('Swin-Tiny\n(saliencia)', SwinMultiSliceClassifier, f'swin_small_multiseed/best_{PLANE}_multiseed_final.pth', generate_saliency_overlay, False),
+    ('Swin-Tiny\n(saliencia)', SwinMultiSliceClassifier, f'swin_tiny_multiseed/best_{PLANE}_multiseed_final.pth', generate_saliency_overlay, False),
 ]
 
 
@@ -130,13 +130,13 @@ def compose_like_app(gray_2d, rgba):
 
 
 def main():
-    figs_dir = BASE / 'TFG' / 'tfgs' / 'figs' / 'outputs'
+    figs_dir = BASE / 'memoria' / 'tfgs' / 'figs' / 'outputs'
     slices, idxs = get_slices()
     SIZE = 256  # la app emite overlays de 256x256
 
     # 5 cortes de referencia: top-5 por atencion del Swin (coherencia con la
     # figura del cuerpo principal), aplicados a las tres arquitecturas.
-    ref = load_model(SwinMultiSliceClassifier, f'swin_small_multiseed/best_{PLANE}_multiseed_final.pth')
+    ref = load_model(SwinMultiSliceClassifier, f'swin_tiny_multiseed/best_{PLANE}_multiseed_final.pth')
     attn_ref = attention_over_slices(ref, slices)
     del ref
     order = sorted(np.argsort(attn_ref)[::-1][:N_SHOW].tolist())

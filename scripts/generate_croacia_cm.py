@@ -5,10 +5,10 @@ Croacia (plano sagital, sin reajuste de pesos), con el MISMO formato visual que
 las matrices por modelo de MRNet (*_cm_grafica.png).
 
 Los valores (VN, FP, FN, VP) provienen de la Tabla de matrices de confusión de
-Croacia zero-shot de la memoria (TFG/tfgs/tex/resultados.tex). No requiere modelo
+Croacia zero-shot de la memoria (memoria/tfgs/tex/resultados.tex). No requiere modelo
 ni datos: solo dibuja.
 
-Salida: TFG/tfgs/figs/outputs/CROACIA_cm_grafica.png
+Salida: memoria/tfgs/figs/outputs/CROACIA_cm_grafica.png
 """
 from pathlib import Path
 
@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 BASE = Path('/home/palodo2/acl_classifier')
-OUT = BASE / 'TFG' / 'tfgs' / 'figs' / 'outputs' / 'CROACIA_cm_grafica.png'
+OUT = BASE / 'memoria' / 'tfgs' / 'figs' / 'outputs' / 'CROACIA_cm_grafica.png'
 
 # Paleta tomada de las matrices de MRNet (*_cm_grafica.png)
 GREEN = '#52B788'   # VN (verdadero negativo)

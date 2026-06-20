@@ -5,7 +5,7 @@ TRES falsos negativos comunes del conjunto de test (casos 0080, 0087, 0521),
 plano sagital, con el modelo Swin-Tiny multi-semilla usado en la memoria.
 
 Mismo algoritmo de saliencia que la app (generate_saliency_overlay).
-Salida: TFG/tfgs/figs/outputs/fn_comunes_sagital_gradcam.png
+Salida: memoria/tfgs/figs/outputs/fn_comunes_sagital_gradcam.png
 
 Se ejecuta en CPU para no interferir con la GPU.
 """
@@ -33,7 +33,7 @@ DEVICE = torch.device('cpu')
 PLANE = 'sagittal'
 CASES = ['0080', '0087', '0521']
 N_SHOW = 4
-CKPT = BASE / 'checkpoints' / 'swin_multiseed_tiny' / f'best_{PLANE}_multiseed_final.pth'
+CKPT = BASE / 'checkpoints' / 'swin_tiny_multiseed' / f'best_{PLANE}_multiseed_final.pth'
 
 model_transform = transforms.Compose([
     transforms.Resize((224, 224)),
@@ -118,7 +118,7 @@ def gray224(slice_u8):
 
 
 def main():
-    out_dir = BASE / 'TFG' / 'tfgs' / 'figs' / 'outputs'
+    out_dir = BASE / 'memoria' / 'tfgs' / 'figs' / 'outputs'
     model = load_model()
     rows = []
     for case in CASES:

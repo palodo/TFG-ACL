@@ -7,7 +7,7 @@ Genera las figuras de explicabilidad del TFG con el MISMO algoritmo que la app
 
 Se ejecuta en CPU para no interferir con entrenamientos en GPU.
 
-Salidas (en TFG/tfgs/figs/):
+Salidas (en memoria/tfgs/figs/):
   - app_gradcam_planes.png   : rejilla 3 planos x 5 cortes con overlay
   - app_heatmaps_sorted.png  : sagital, fila superior RM original / inferior overlay
 """
@@ -38,7 +38,7 @@ PLANES = ['sagittal', 'coronal', 'axial']
 PLANE_ES = {'sagittal': 'Sagital', 'coronal': 'Coronal', 'axial': 'Axial'}
 N_SHOW = 5
 
-CKPT = {p: BASE / 'checkpoints' / 'swin_small_multiseed' / f'best_{p}_multiseed_final.pth'
+CKPT = {p: BASE / 'checkpoints' / 'swin_tiny_multiseed' / f'best_{p}_multiseed_final.pth'
         for p in PLANES}
 
 model_transform = transforms.Compose([
@@ -122,7 +122,7 @@ def gray224(slice_u8):
 
 
 def main():
-    figs_dir = BASE / 'TFG' / 'tfgs' / 'figs'
+    figs_dir = BASE / 'memoria' / 'tfgs' / 'figs'
     plane_data = {}
     for plane in PLANES:
         print(f'[{plane}] cargando modelo y calculando saliencias...')

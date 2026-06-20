@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 
 BASE = Path(__file__).resolve().parents[1]
-FIGS = BASE / 'TFG' / 'tfgs' / 'figs'
+FIGS = BASE / 'memoria' / 'tfgs' / 'figs'
 CASE = '0105'
 
 # Paleta sobria

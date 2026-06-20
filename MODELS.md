@@ -21,7 +21,7 @@ Para el ensamble multi-vista y la inferencia (lo que usa la memoria) bastan los 
 checkpoints/
 ├── cnn_multiseed_resnet50/best_{sagittal,coronal,axial}_multiseed_final.pth   # ResNet50
 ├── vit_small_multiseed/best_{sagittal,coronal,axial}_multiseed_final.pth      # ViT-Small (22M)
-├── swin_multiseed_tiny/best_{sagittal,coronal,axial}_multiseed_final.pth      # Swin-Tiny (28M)
+├── swin_tiny_multiseed/best_{sagittal,coronal,axial}_multiseed_final.pth      # Swin-Tiny (28M)
 └── acl_slice_classifier_v3/ , acl_slice_classifier_coronal/                   # selectores de cortes (MobileNetV2)
 ```
 
@@ -34,6 +34,12 @@ El resto de carpetas de `checkpoints/` corresponden a experimentos de comparaci�
 memoria pero no son necesarios para la inferencia: variantes grandes (`vit_multiseed_base`,
 `swin_base_baseline`), la Swin-Small auténtica que no converge (`swin_small_REAL_multiseed`),
 baselines de una sola semilla (`*_baseline`) y ConvNeXt.
+
+Aviso sobre nombres: el Swin-Tiny canónico es `swin_tiny_multiseed`. Existe `swin_tiny_multiseed_legacy`,
+que es un entrenamiento anterior del mismo modelo, conservado solo por trazabilidad. Las carpetas
+`swin_baseline`, `swin_tiny_baseline` y `swin_small_baseline` (renombrada a `swin_tiny_baseline`)
+contienen modelos Swin-Tiny pese a algún nombre heredado; la única Swin-Small real es
+`swin_small_REAL_multiseed`.
 
 El pooling por plano debe coincidir con el del entrenamiento al cargar un checkpoint: *attention*
 en sagital y axial, *max* en coronal. Los notebooks de cada arquitectura ya lo configuran.

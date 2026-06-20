@@ -635,7 +635,7 @@ def main():
             selector_probs['axial'] = []
 
         # Swin Classifiers Loading
-        swin_dir = checkpoints_dir / 'swin_small_multiseed'
+        swin_dir = checkpoints_dir / 'swin_tiny_multiseed'
         swin_models = {
             'sagittal': swin_dir / 'best_sagittal_multiseed_final.pth',
             'coronal': swin_dir / 'best_coronal_multiseed_final.pth',

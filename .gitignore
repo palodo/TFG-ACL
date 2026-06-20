@@ -102,3 +102,4 @@ paper/
 /VIT_ROC_test.png
 *.bak
 
+.train_pid
