@@ -1,81 +1,113 @@
-# Detección de Lesiones del Ligamento Cruzado Anterior (LCA) mediante Deep Learning
+# Detección de roturas del ligamento cruzado anterior en RM de rodilla
 
-Este proyecto corresponde a un Trabajo de Fin de Grado (TFG) de la Universidad de Valencia enfocado en la clasificación automática de roturas del ligamento cruzado anterior (LCA/ACL) a partir de resonancias magnéticas (RM) de rodilla.
+Código del Trabajo de Fin de Grado (Grado en Ciencia de Datos, Universitat de València) sobre
+clasificación automática de roturas del ligamento cruzado anterior (LCA) a partir de resonancias
+magnéticas de rodilla.
 
-El sistema utiliza un enfoque de diagnóstico de extremo a extremo (*end-to-end*) sin segmentación anatómica manual previa, combinando los tres planos de visión clínicos (sagitario, coronal y axial) mediante un ensamble multi-vista.
+El sistema no segmenta el ligamento ni depende de anotaciones manuales por corte. A partir del
+volumen completo, un selector aprendido elige los cortes más informativos de cada plano, un
+clasificador procesa esos cortes y la decisión final se obtiene combinando los tres planos
+anatómicos (sagital, coronal y axial). Sobre las probabilidades del conjunto de validación se fija
+un umbral de decisión con criterio clínico (maximizar sensibilidad manteniendo una precisión
+mínima del 75 %).
 
----
+La pregunta de fondo del trabajo no es solo "¿funciona?", sino si hace falta un modelo grande para
+que funcione. La conclusión es que no: las variantes compactas (ViT-Small de 22 M y Swin-Tiny de
+28 M) igualan o superan a sus versiones grandes en este conjunto de datos.
 
-## Materiales y Conjuntos de Datos
+## Datos
 
-En este estudio se emplean dos conjuntos de datos independientes para validar tanto el rendimiento interno como la capacidad de transferencia clínica real:
+Se usan dos conjuntos, ninguno incluido en el repositorio por tamaño y licencia (ver
+[DATA.md](DATA.md) para obtenerlos y colocarlos en las rutas esperadas):
 
-1. **Dataset Principal (MRNet - Universidad de Stanford):**
-   * **Total:** 1.250 estudios de RM tridimensionales (sagitario, coronal y axial).
-   * **Distribución:** 875 casos para entrenamiento, 188 para validación y 187 para prueba final.
-   * **Prevalencia:** Aproximadamente el 21% de los casos presentan rotura del LCA, lo que simula el desbalance clínico real.
+- **MRNet** (Stanford), dominio principal: 1.250 estudios con los tres planos. Particiones a nivel
+  de paciente: 875 entrenamiento, 188 validación, 187 test. La prevalencia de rotura ronda el 21 %,
+  coherente con el desbalance clínico real.
+- **Hospital Clínico de Rijeka, Croacia**, validación externa: 917 estudios. Las roturas parciales y
+  completas se unifican como clase positiva. Se emplea para transferencia directa (*zero-shot*) y
+  para un experimento de adaptación de dominio.
 
-2. **Dataset de Validación Externa (Hospital Clínico de Rijeka, Croacia):**
-   * **Total:** 917 estudios anotados. Para hacerlos compatibles, se unificaron las roturas parciales y completas como casos positivos.
-   * **Uso:** Validación *zero-shot* (transferencia directa del modelo sin reentrenamiento) y experimentos de adaptación de dominio (*fine-tuning*) con una partición de prueba local de 138 casos.
+## Enfoque
 
----
+1. Selección de cortes por plano con un MobileNetV2 entrenado para puntuar relevancia anatómica
+   (5 cortes en sagital, 10 en coronal; en axial se usan cortes centrales).
+2. Backbone por plano sobre los cortes seleccionados, con agregación entre cortes mediante
+   *attention pooling* en sagital y axial y *max pooling* en coronal.
+3. Ensamble multi-vista: media de las probabilidades de los tres planos.
+4. Umbral de decisión calibrado en validación (recall máximo con precisión ≥ 0,75).
 
-## Arquitecturas Comparadas
+Se comparan tres arquitecturas bajo el mismo protocolo (mismo selector, mismo pooling por plano,
+diez semillas por plano):
 
-Se evalúa y contrasta el comportamiento de tres enfoques de visión artificial de distinta naturaleza:
+- ResNet50, convolucional (~23,5 M parámetros).
+- ViT-Small, atención global por parches (~22 M).
+- Swin-Tiny, atención jerárquica por ventanas desplazadas (~28 M).
 
-* **ResNet50 (Convolucional):** Red clásica basada en circunvoluciones locales y conexiones residuales (23.5 millones de parámetros).
-* **ViT-Small (Vision Transformer Global):** Modelo de autoatención global que procesa la imagen dividida en parches (22 millones de parámetros).
-* **Swin-Tiny (Vision Transformer Jerárquico):** Evolución de ViT que restringe la atención a ventanas locales desplazadas, permitiendo capturar características a múltiples escalas de forma eficiente (27.8 millones de parámetros).
+## Resultados (ensamble multi-vista, MRNet)
 
-*Nota metodológica:* Todos los modelos integran un módulo automático de selección de cortes relevantes (MobileNetV2) que filtra y extrae las imágenes donde el ligamento es visible (5 cortes sagitales, 10 coronales y 10 axiales), seguidos de un mecanismo de agregación por atención (*Attention Pooling*).
+| Modelo    | AUC val | AUC test | Recall test | F1 test |
+|-----------|:------:|:-------:|:----------:|:------:|
+| ResNet50  | 0,9836 | 0,9545  | 0,8837     | 0,7379 |
+| ViT-Small | 0,9837 | 0,9433  | 0,8837     | 0,7525 |
+| Swin-Tiny | 0,9837 | 0,9536  | 0,9070     | 0,7459 |
 
----
+No hay un ganador único: ResNet50 da el mayor AUC en test, Swin-Tiny la mayor sensibilidad (39 de
+43 roturas detectadas, 4 falsos negativos) y ViT-Small el mejor F1. En la validación externa sobre
+Croacia *zero-shot* el rendimiento baja por el cambio de dominio (Swin-Tiny obtiene el mejor AUC
+externo, 0,8821); un *fine-tuning* de Swin-Tiny sobre Croacia sube el AUC de 0,9236 a 0,9362 en ese
+dominio. El detalle está en la memoria.
 
-## Resultados Clave
+## Organización del repositorio
 
-### 1. Rendimiento Interno (Prueba en MRNet)
-Los tres modelos logran un excelente desempeño en la clasificación de lesiones sobre el conjunto de test propio de Stanford:
-* **ResNet50:** Obtiene el mayor rendimiento discriminativo global con un **AUC de 0.9545** (Sensibilidad: 88.37%, F1-Score: 0.7379).
-* **Swin-Tiny:** Destaca por su alta seguridad diagnóstica, alcanzando la mayor sensibilidad (**Recall del 90.70%**, con solo 4 falsos negativos en el test). Su AUC es de **0.9536**.
-* **ViT-Small:** Ofrece el mejor balance general con un F1-Score de **0.7525** (AUC: 0.9433).
+- `src/` — código compartido: arquitecturas (`models.py`), carga de datos, utilidades de
+  entrenamiento.
+- `experiments/` — notebooks de entrenamiento por arquitectura (cnn, vit, vit_small, vit_tiny,
+  swin_tiny, swin_small, swin_base, convnext), incluyendo los multiseed.
+- `pipeline/` — pipeline final integrado: ensamble y calibración de umbral, inferencia desde DICOM,
+  mapas de atención.
+- `data_prep/` — preparación de los datos externos de Croacia.
+- `analysis/` — notebooks de análisis transversal (pipeline optimizado, falsos negativos,
+  predicción desde DICOM).
+- `scripts/` — utilidades reproducibles (predicción de un paciente, generación de figuras de la
+  memoria, recálculo de métricas).
+- `app/` — aplicación web del demostrador (frontend en React + servidor Node + motor de inferencia).
+- `memoria/` — documento del TFG en LaTeX y su PDF compilado.
+- `docs/` — documentación adicional y figuras del pipeline.
 
-### 2. Capacidad de Generalización (Validación en Croacia)
-Al evaluar los modelos entrenados en Stanford directamente sobre el conjunto de Croacia sin realizar ajustes (*zero-shot*), se observa una caída de rendimiento debido al cambio de escáner y población (cambio de dominio):
-* **Transformers (Swin-Tiny y ViT-Small):** Demuestran ser más robustos. **Swin-Tiny** obtiene el mejor rendimiento general con un **AUC de 0.8821**, mientras que **ViT-Small** mantiene la sensibilidad más alta (**68.28%**).
-* **CNN (ResNet50):** Sufre el mayor impacto clínico, con su **AUC cayendo hasta 0.7847**, lo que evidencia un mayor sobreajuste a las particularidades visuales de las imágenes originales de Stanford.
+Los pesos entrenados (`checkpoints/`) y los datos (`data/`) no se versionan; ver [MODELS.md](MODELS.md)
+y [DATA.md](DATA.md).
 
-### 3. Adaptación de Dominio (*Fine-Tuning*)
-Para solucionar el cambio de dominio, se realizó un reentrenamiento parcial (*fine-tuning*) de **Swin-Tiny** usando casos locales de Croacia. Como resultado, la capacidad discriminativa en este conjunto externo aumentó de un **AUC de 0.9236 a 0.9362** (+0.0126), demostrando la viabilidad de adaptar el sistema a nuevos centros hospitalarios.
+## Uso
 
----
+Instalación de dependencias de Python:
 
-## Estructura del Código
+```bash
+pip install -r requirements.txt
+```
 
-* **`src/`**: Código fuente de carga de datos, definición de las arquitecturas y funciones de entrenamiento.
-* **`scripts/predict_patient.py`**: Script unificado de diagnóstico. Permite clasificar una resonancia magnética en ZIP y obtener mapas de Grad-CAM.
-* **`app/`**: Aplicación web interactiva (React frontend + Node backend) que despliega de manera gráfica el asistente de diagnóstico.
-* **`final_model/`**: Jupyter Notebooks enfocados en el análisis final y la validación cruzada.
+Diagnóstico de un estudio (ZIP con la serie DICOM) desde terminal, con mapas de explicabilidad:
 
----
+```bash
+python scripts/predict_patient.py --zip ruta/al/estudio.zip
+```
 
-## Inicio Rápido
+Aplicación web (compila el frontend y arranca el servidor en `http://localhost:5000`):
 
-1. Instalar dependencias:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Realizar un diagnóstico desde terminal:
-   ```bash
-   python scripts/predict_patient.py --zip /ruta/al/caso_paciente.zip
-   ```
-3. Ejecutar la interfaz web:
-   ```bash
-   python app/start_server.py
-   ```
+```bash
+python app/start_server.py
+```
 
----
+La inferencia requiere los pesos descritos en [MODELS.md](MODELS.md).
 
-**Autor:** Pablo
-**Trabajo de Fin de Grado** - Universidad de Valencia (UV)
+## Memoria
+
+El documento completo está en `memoria/tfgs/` (LaTeX) y se compila con `tectonic`:
+
+```bash
+cd memoria/tfgs && tectonic -X compile ejemplo-memoria.tex
+```
+
+## Autoría
+
+Pablo López Domínguez. Trabajo de Fin de Grado, Universitat de València. Tutores: José David Martín
+Guerrero y Yolanda Vives Gilabert.
