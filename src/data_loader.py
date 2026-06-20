@@ -15,7 +15,7 @@ import torchvision.transforms as transforms
 class OptimizedMRNetDataset(Dataset):
     """
     Optimized dataset using pre-calculated slice indices.
-    
+
     Advantages:
     - No need for CNN Selector at runtime
     - Instant slice loading
@@ -36,11 +36,11 @@ class OptimizedMRNetDataset(Dataset):
         self.df = pd.read_csv(csv_path, header=None, names=['case', 'label'])
         self.data_root = Path(data_root)
         self.plane = plane
-        
+
         # Load pre-calculated indices
         with open(indices_cache_path, 'r') as f:
             self.indices_cache = json.load(f)
-        
+
         # Determine which transform to use
         if augmentation_mode:
             self.transform = get_train_transform(augmentation_mode)
@@ -48,15 +48,15 @@ class OptimizedMRNetDataset(Dataset):
             self.transform = transform
         else:
             self.transform = get_val_test_transform()
-        
-        print(f"✓ Dataset cargado: {len(self.df)} casos")
+
+        print(f" Dataset cargado: {len(self.df)} casos")
         print(f"  Plane: {plane}")
         print(f"  Augmentation: {augmentation_mode if augmentation_mode else 'None (usando transform directo)'}")
         print(f"  Índices cacheados: {indices_cache_path}")
-    
+
     def __len__(self):
         return len(self.df)
-    
+
     def __getitem__(self, idx):
         """
         Return a case with selected slices and label.
@@ -64,28 +64,28 @@ class OptimizedMRNetDataset(Dataset):
         row = self.df.iloc[idx]
         case_id = row['case']
         label = row['label']
-        
+
         # Load full volume
         volume_path = self.data_root / self.plane / f"{case_id:04d}.npy"
         volume = np.load(volume_path).astype(np.float32)
-        
+
         # Get pre-calculated indices for this case
         selected_indices = self.indices_cache[str(case_id)]
-        
+
         # Extract only selected slices
         selected_slices = volume[selected_indices]  # (K, H, W)
-        
+
         # Min-max normalization
         vol_min = selected_slices.min()
         vol_max = selected_slices.max()
         if vol_max > vol_min:
             selected_slices = (selected_slices - vol_min) / (vol_max - vol_min)
-        
+
         # Convert to tensor and replicate to 3 channels
         selected_slices = torch.from_numpy(selected_slices).float()
         selected_slices = selected_slices.unsqueeze(1)  # (K, 1, H, W)
         selected_slices = selected_slices.repeat(1, 3, 1, 1)  # (K, 3, H, W)
-        
+
         # Apply transformations if available
         if self.transform:
             transformed_slices = []
@@ -93,10 +93,10 @@ class OptimizedMRNetDataset(Dataset):
                 slice_transformed = self.transform(selected_slices[i])
                 transformed_slices.append(slice_transformed)
             selected_slices = torch.stack(transformed_slices, dim=0)  # (K, 3, 224, 224)
-        
+
         # Convert label to tensor
         label_tensor = torch.tensor(label, dtype=torch.float32)
-        
+
         return selected_slices, label_tensor, case_id
 
 
@@ -107,10 +107,10 @@ class OptimizedMRNetDataset(Dataset):
 def get_train_transform(augmentation_mode='conservative'):
     """
     Return training transformations based on augmentation mode.
-    
+
     Args:
         augmentation_mode: 'conservative', 'moderate', or 'aggressive'
-    
+
     Returns:
         transforms.Compose with appropriate transformations
     """

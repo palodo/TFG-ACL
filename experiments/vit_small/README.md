@@ -58,7 +58,7 @@ La configuración por plano está definida en el notebook:
 - Learning Rate: 1.2e-4
 - Weight Decay: 1e-3
 - Dropout: 0.25 / 0.15
-- Grad Clip: ✓
+- Grad Clip:
 - Early Stopping Patience: 15
 - Warmup Epochs: 5
 
@@ -66,7 +66,7 @@ La configuración por plano está definida en el notebook:
 - Learning Rate: 1.2e-4
 - Weight Decay: 5e-4
 - Dropout: 0.25 / 0.15
-- Grad Clip: ✓
+- Grad Clip:
 - Label Smoothing: 0.05
 - Early Stopping Patience: 15
 - Warmup Epochs: 5
@@ -86,7 +86,7 @@ Los checkpoints se guardan en `/checkpoints/vit_small_baseline/`:
 2. Ejecuta cell 1: Imports
 3. Ejecuta cell 2: Global Configuration
 4. Ejecuta cells 3-4: Entrenar Sagittal
-5. Ejecuta cells 5-6: Entrenar Coronal  
+5. Ejecuta cells 5-6: Entrenar Coronal
 6. Ejecuta cells 7-8: Entrenar Axial
 7. Ejecuta cell 9: Load ensemble models
 8. Ejecuta cell 10: Make predictions

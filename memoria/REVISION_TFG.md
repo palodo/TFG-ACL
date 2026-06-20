@@ -6,7 +6,7 @@
 
 Este documento está pensado para que lo uses como guion al reescribir el TFG.
 Cada sección indica: (1) qué dice ahora el PDF, (2) qué dice realmente el código/notebooks,
-(3) qué hay que corregir o añadir. Los puntos marcados con **🔴 CRÍTICO** son errores
+(3) qué hay que corregir o añadir. Los puntos marcados con ** CRÍTICO** son errores
 conceptuales o factuales que un tribunal puede detectar y que conviene arreglar sí o sí.
 
 ---
@@ -15,14 +15,14 @@ conceptuales o factuales que un tribunal puede detectar y que conviene arreglar 
 
 | # | Severidad | Hallazgo | Dónde |
 |---|-----------|----------|-------|
-| 1 | 🔴 CRÍTICO | El "Swin-Small" es en realidad **Swin-Tiny** (27.8 M parámetros, no 49.6/49.7 M) | Cap. 3.6, 4.0.4 |
-| 2 | 🔴 CRÍTICO | Se afirma resolución de entrada **256×256 para Swin**; el código redimensiona **siempre a 224×224** | Cap. 2.2, 3.6 |
-| 3 | 🔴 CRÍTICO | El selector de cortes es **MobileNetV2**, no MobileNetV3 | Cap. 3.2 |
-| 4 | 🟠 IMPORTANTE | El CSV guardado de Croacia da **AUC 0.5058**, pero el notebook y el PDF reportan **0.8821**: hay una ejecución incoherente sin resolver | `final_model/results_threshold/comparacion_metricas.csv` |
-| 5 | 🟠 IMPORTANTE | Tablas de regularización con discrepancias puntuales (early stopping coronal de ViT, etc.) | Cap. 3.4–3.6 |
-| 6 | 🟡 MENOR | Capítulo 5 (Conclusiones y Trabajo futuro) está **vacío** | Cap. 5 |
-| 7 | 🟡 MENOR | Métricas de F1/precisión en validación se calculan con umbral fijo 0.5 dentro del entrenamiento, pero el ensamble usa umbral calibrado: aclarar para no confundir | `src/training_utils.py`, Cap. 4 |
-| 8 | 🟡 MENOR | La app rellena por defecto un **nombre de paciente real** ("Marc Alberola Guillot") cuando faltan metadatos DICOM | `scripts/predict_patient.py` (corregido) |
+| 1 |  CRÍTICO | El "Swin-Small" es en realidad **Swin-Tiny** (27.8 M parámetros, no 49.6/49.7 M) | Cap. 3.6, 4.0.4 |
+| 2 |  CRÍTICO | Se afirma resolución de entrada **256×256 para Swin**; el código redimensiona **siempre a 224×224** | Cap. 2.2, 3.6 |
+| 3 |  CRÍTICO | El selector de cortes es **MobileNetV2**, no MobileNetV3 | Cap. 3.2 |
+| 4 |  IMPORTANTE | El CSV guardado de Croacia da **AUC 0.5058**, pero el notebook y el PDF reportan **0.8821**: hay una ejecución incoherente sin resolver | `final_model/results_threshold/comparacion_metricas.csv` |
+| 5 |  IMPORTANTE | Tablas de regularización con discrepancias puntuales (early stopping coronal de ViT, etc.) | Cap. 3.4–3.6 |
+| 6 |  MENOR | Capítulo 5 (Conclusiones y Trabajo futuro) está **vacío** | Cap. 5 |
+| 7 |  MENOR | Métricas de F1/precisión en validación se calculan con umbral fijo 0.5 dentro del entrenamiento, pero el ensamble usa umbral calibrado: aclarar para no confundir | `src/training_utils.py`, Cap. 4 |
+| 8 |  MENOR | La app rellena por defecto un **nombre de paciente real** ("Marc Alberola Guillot") cuando faltan metadatos DICOM | `scripts/predict_patient.py` (corregido) |
 
 ---
 
@@ -72,7 +72,7 @@ del PDF no coinciden con él:
 
 **Estado actual:** describe MRNet, el conjunto de Croacia, y el preprocesamiento.
 
-### 🔴 CRÍTICO #2 — Resolución de entrada
+### CRÍTICO #2 — Resolución de entrada
 - El PDF (2.2 y 3.6) dice: *"todas las imágenes fueron redimensionadas a 224×224"* y luego que
   *"Swin-Small se configuró utilizando imágenes de entrada de mayor resolución espacial (256×256)"*.
   **Son afirmaciones contradictorias y la segunda es falsa.**
@@ -86,7 +86,7 @@ del PDF no coinciden con él:
 **Otros puntos:**
 - La normalización Min-Max y la réplica a 3 canales están bien descritas y coinciden con el código.
 - Las cifras de splits MRNet (875/188/187) y de Croacia (917; 690 sin rotura / 227 con rotura;
-  fine-tuning 641/138/138) coinciden con CSVs y notebooks. ✔️
+  fine-tuning 641/138/138) coinciden con CSVs y notebooks.
 - Sugerencia: indica explícitamente que MRNet aquí es un **re-split a nivel de paciente** propio
   (total 1250), distinto del split oficial de Stanford (1130/120), para que no confundan tus cifras
   con las del paper original.
@@ -97,7 +97,7 @@ del PDF no coinciden con él:
 
 ### 3.2 Selección automática de cortes
 
-### 🔴 CRÍTICO #3 — Backbone del selector
+### CRÍTICO #3 — Backbone del selector
 - El PDF dice **MobileNetV3** ("se desarrolló un módulo propio de selección automática de cortes
   basado en una arquitectura MobileNetV3").
 - El código usa **`mobilenetv2_100`** (timm) tanto en `src/models.py::ACLSliceClassifier` /
@@ -113,7 +113,7 @@ K=10 coronal (CNN-based), K=10 axial (cortes centrales). Coincide con el código
   como usas el backbone sin la fc final, ~23.5 M es defendible; puedes precisar "≈ 23.5 M en el
   backbone de extracción de características").
 - Pooling por plano (sagital attention, coronal max, axial attention): **coincide** con
-  `PLANE_CONFIG` del notebook `cnn_multiseed`. ✔️
+  `PLANE_CONFIG` del notebook `cnn_multiseed`.
 - **Revisar Tabla 3.2 (regularización):** los valores de dropout (0.42/0.47/0.42 y 0.32/0.37/0.32)
   y label smoothing (0.17/0.22/0.17) coinciden con el notebook. El early stopping (12/10/12) hay
   que **verificarlo** contra `PLANE_SPECIFIC_CONFIG` de `cnn_multiseed` (el sagital es 12; confirma
@@ -121,15 +121,15 @@ K=10 coronal (CNN-based), K=10 axial (cortes centrales). Coincide con el código
 
 ### 3.5 ViT-Base
 - `google/vit-base-patch16-224`, 12 bloques, embedding 768, 12 cabezas, ~86 M parámetros: **correcto**
-  y coincide con el código y el checkpoint (`position_embeddings (1,197,768)`). ✔️
-- Pooling (sagital attention, coronal max, axial attention): coincide con `cnn`/`vit` `PLANE_CONFIG`. ✔️
+  y coincide con el código y el checkpoint (`position_embeddings (1,197,768)`).
+- Pooling (sagital attention, coronal max, axial attention): coincide con `cnn`/`vit` `PLANE_CONFIG`.
 - **Revisar Tabla 3.3:** el PDF pone early stopping coronal = **15 épocas**, pero el notebook
   `vit_multiseed` tiene coronal = **25 épocas** (sagital 25, coronal 25, axial 15). Corrige el coronal.
-- Label smoothing 0.05/0.05/0.10: coincide. ✔️
+- Label smoothing 0.05/0.05/0.10: coincide.
 
 ### 3.6 Swin
 
-### 🔴 CRÍTICO #1 — Es Swin-Tiny, no Swin-Small
+### CRÍTICO #1 — Es Swin-Tiny, no Swin-Small
 - El PDF lo llama **Swin-Small** y le asigna **49.6 M** (Tabla 3.1) / **49.7 M** (texto 3.6.1).
 - El código instancia **`swin_tiny_patch4_window7_224.ms_in1k`** en `SwinMultiSliceClassifier`
   (`src/models.py`, feature_dim **768**). Existe una clase `SwinBaseMultiSliceClassifier`
@@ -151,11 +151,11 @@ K=10 coronal (CNN-based), K=10 axial (cortes centrales). Coincide con el código
 
 **Bien en 3.6:** la descripción conceptual del shifted-window attention, el sesgo de posición
 relativa B, el Patch Merging jerárquico y el pooling por atención en los 3 planos son correctos y
-coinciden con `PLANE_CONFIG` de `swin_small_multiseed` (los 3 planos usan attention). ✔️
+coinciden con `PLANE_CONFIG` de `swin_small_multiseed` (los 3 planos usan attention).
 
 **Detalle de entrenamiento Swin que sí coincide:** AdamW, lr inicial 1.3e-4, ReduceLROnPlateau
 factor 0.5, grad clipping norma 1.0, dropout axial input 0.0. Tabla 3.4 (0.42/0.42/0.00 input,
-0.32/0.32/0.20 dense, ls 0.17/0.17/0.05, early stopping 12/40/30) **coincide** con el notebook. ✔️
+0.32/0.32/0.20 dense, ls 0.17/0.17/0.05, early stopping 12/40/30) **coincide** con el notebook.
 
 ---
 
@@ -164,7 +164,7 @@ factor 0.5, grad clipping norma 1.0, dropout axial input 0.0. Tabla 3.4 (0.42/0.
 ### 4.0.1 Diseño experimental
 - El protocolo (10 semillas 42–51, selección de checkpoint por validación, test solo como
   estimación final, umbral τ* = argmax recall s.a. precisión ≥ 0.75, ensamble por promedio simple)
-  es correcto y coincide con `find_optimal_threshold_recall` y los notebooks de threshold. ✔️
+  es correcto y coincide con `find_optimal_threshold_recall` y los notebooks de threshold.
 - **Punto a aclarar (#7):** dentro del entrenamiento (`evaluate` en `training_utils.py`) el F1 se
   calcula con `np.round` (umbral 0.5). Esos F1 "internos" **no** son los del ensamble calibrado.
   En el capítulo 4 las métricas operativas vienen del notebook de threshold (umbral calibrado), que
@@ -172,16 +172,16 @@ factor 0.5, grad clipping norma 1.0, dropout axial input 0.0. Tabla 3.4 (0.42/0.
 
 ### 4.0.2–4.0.4 Resultados por arquitectura
 - Tablas de estabilidad multi-semilla (ResNet50, ViT-Base, Swin): los AUC medios/desv./mín/máx que
-  aparecen en el PDF coinciden con los outputs de los notebooks. ✔️ (p.ej. Swin axial 0.9560±0.0123,
+  aparecen en el PDF coinciden con los outputs de los notebooks.  (p.ej. Swin axial 0.9560±0.0123,
   sagital 0.9223±0.0787, coronal 0.7748±0.1348 — esa alta varianza del coronal está bien comentada).
 - Umbrales por arquitectura: ResNet50 τ=0.5445, ViT-Base τ=0.5135, Swin τ=0.3734 — coinciden con los
-  notebooks y con `scripts/predict_patient.py`. ✔️
+  notebooks y con `scripts/predict_patient.py`.
 - Métricas de test del ensamble Swin (AUC 0.9536, recall 0.9070, 4 FN, 23 FP) coinciden con el
-  output ejecutado (`final_model/Threshold_Tuning_and_External_Validation.ipynb`). ✔️
+  output ejecutado (`final_model/Threshold_Tuning_and_External_Validation.ipynb`).
 - **Recuerda:** al pasar de "Swin-Small" a "Swin-Tiny" hay que sustituir el nombre también en todas
   las tablas 4.9–4.13, figuras 4.5–4.8 y en la discusión.
 
-### 4.0.6 Validación externa (Croacia) — 🟠 IMPORTANTE #4
+### 4.0.6 Validación externa (Croacia) —  IMPORTANTE #4
 - El PDF reporta **AUC zero-shot de Swin en Croacia = 0.8821** (Tabla 4.14), que coincide con el
   **output ejecutado** del notebook (`AUC: 0.8821`, recall 0.5683, esp. 0.9638).
 - **Pero** el fichero guardado `final_model/results_threshold/comparacion_metricas.csv` dice
@@ -197,12 +197,12 @@ factor 0.5, grad clipping norma 1.0, dropout axial input 0.0. Tabla 3.4 (0.42/0.
   porque Croacia solo tiene sagital fiable. Déjalo dicho explícitamente (ya lo está, bien).
 
 ### 4.0.7 Fine-tuning en Croacia
-- AUC test Croacia antes 0.9236 → después 0.9362 (+0.0126): coincide con el output ejecutado. ✔️
+- AUC test Croacia antes 0.9236 → después 0.9362 (+0.0126): coincide con el output ejecutado.
   (Ojo: el "antes" zero-shot sobre el *subconjunto de test* de Croacia es 0.9236, distinto del
   0.8821 sobre el *conjunto completo*; conviene aclarar que son poblaciones distintas para que no
   parezca contradicción.)
 - Congelar backbone 2 épocas + ajuste completo, lr 2e-4, pos_weight 3.0314, dropout 0.3/0.2:
-  coincide con la llamada a `train_model`. ✔️
+  coincide con la llamada a `train_model`.
 
 ### 4.0.8 Discusión
 - Bien planteada. Sugerencia: cuando renombres a Swin-Tiny, refuerza la conclusión de **eficiencia**
@@ -210,7 +210,7 @@ factor 0.5, grad clipping norma 1.0, dropout axial input 0.0. Tabla 3.4 (0.42/0.
 
 ---
 
-## Capítulo 5 — Conclusiones y Trabajo futuro  🟡 #6
+## Capítulo 5 — Conclusiones y Trabajo futuro   #6
 
 **Está vacío en el PDF** (solo aparecen los títulos 5.1 y 5.2). Hay que redactarlo. Guion sugerido:
 

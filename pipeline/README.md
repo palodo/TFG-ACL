@@ -1,6 +1,6 @@
 # Final Model: Swin Small Model Selection & Validation
 
-## 📁 Estructura
+## Estructura
 
 ```
 final_model/
@@ -13,7 +13,7 @@ final_model/
 └── README.md                                      # Este archivo
 ```
 
-## 📋 Contenido del Notebook
+## Contenido del Notebook
 
 ### **Objetivo**
 Justificar y validar **Swin Transformer Small (multiseed)** como modelo elegido para clasificación de ACL.
@@ -42,7 +42,7 @@ Justificar y validar **Swin Transformer Small (multiseed)** como modelo elegido 
    - Evaluación en test set
    - Validación externa con dataset de Croacia
 
-## 🚀 Cómo Ejecutar
+## Cómo Ejecutar
 
 ```bash
 # Abrir VS Code y ejecutar el notebook
@@ -51,28 +51,28 @@ code /home/palodo2/tfg/acl_classifier/final_model/Swin_Small_Model_Selection_Val
 # Ejecutar celdas en orden (Shift+Enter)
 ```
 
-## 📊 Outputs Esperados
+## Outputs Esperados
 
-- ✅ Tabla CSV con comparación de modelos
-- ✅ Gráficas de threshold tuning y resultados en test
-- ✅ Análisis de validación externa (Croatia)
-- ✅ Reporte de justificación del modelo seleccionado
+-  Tabla CSV con comparación de modelos
+-  Gráficas de threshold tuning y resultados en test
+-  Análisis de validación externa (Croatia)
+-  Reporte de justificación del modelo seleccionado
 
-## 🎯 Justificación Suin Small
+## Justificación Suin Small
 
-### ✓ Ventajas Clave
+### Ventajas Clave
 1. **AUC Superior**: Compite con modelos más complejos
 2. **Balance Clínico**: Recall alto (minimiza falsos negativos)
 3. **Consistencia Per-Plano**: Std bajo entre sagittal/coronal/axial
 4. **Eficiencia**: Menos parámetros que Swin Base / ViT
 5. **Reproducibilidad**: Multiseed (10 semillas) vs single-seed baseline
 
-### ⚠️ Trade-offs
+### Trade-offs
 - Swin Base: +0.35% AUC pero +70% parámetros → No justificado
 - ViT Base: -1% AUC con más complejidad → No competitivo
 - CNN: -2.5% AUC, menos apto para medical imaging → No preferido
 
-## 📝 Para el TFG
+## Para el TFG
 
 Puedes usar este notebook como base para:
 1. **Tabla de justificación**: Mostrar comparativa de modelos en validación
@@ -80,7 +80,7 @@ Puedes usar este notebook como base para:
 3. **Resultados**: Métricas en test y validación externa
 4. **Visualizaciones**: Gráficas de ROC, confusion matrices, threshold optimization
 
-## 🔗 Referencias
+## Referencias
 
 - Modelos base: `/checkpoints/`
 - Datos: `/data/`
@@ -89,5 +89,5 @@ Puedes usar este notebook como base para:
 
 ---
 
-**Created**: 2026-05-05  
+**Created**: 2026-05-05
 **Status**: Ready for TFG documentation

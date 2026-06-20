@@ -6,7 +6,7 @@ El sistema utiliza un enfoque de diagnóstico de extremo a extremo (*end-to-end*
 
 ---
 
-## 📊 Materiales y Conjuntos de Datos
+## Materiales y Conjuntos de Datos
 
 En este estudio se emplean dos conjuntos de datos independientes para validar tanto el rendimiento interno como la capacidad de transferencia clínica real:
 
@@ -21,7 +21,7 @@ En este estudio se emplean dos conjuntos de datos independientes para validar ta
 
 ---
 
-## 🧠 Arquitecturas Comparadas
+## Arquitecturas Comparadas
 
 Se evalúa y contrasta el comportamiento de tres enfoques de visión artificial de distinta naturaleza:
 
@@ -33,7 +33,7 @@ Se evalúa y contrasta el comportamiento de tres enfoques de visión artificial 
 
 ---
 
-## 📈 Resultados Clave
+## Resultados Clave
 
 ### 1. Rendimiento Interno (Prueba en MRNet)
 Los tres modelos logran un excelente desempeño en la clasificación de lesiones sobre el conjunto de test propio de Stanford:
@@ -51,7 +51,7 @@ Para solucionar el cambio de dominio, se realizó un reentrenamiento parcial (*f
 
 ---
 
-## 📁 Estructura del Código
+## Estructura del Código
 
 * **`src/`**: Código fuente de carga de datos, definición de las arquitecturas y funciones de entrenamiento.
 * **`scripts/predict_patient.py`**: Script unificado de diagnóstico. Permite clasificar una resonancia magnética en ZIP y obtener mapas de Grad-CAM.
@@ -60,7 +60,7 @@ Para solucionar el cambio de dominio, se realizó un reentrenamiento parcial (*f
 
 ---
 
-## 🚀 Inicio Rápido
+## Inicio Rápido
 
 1. Instalar dependencias:
    ```bash
@@ -77,5 +77,5 @@ Para solucionar el cambio de dominio, se realizó un reentrenamiento parcial (*f
 
 ---
 
-**Autor:** Pablo  
+**Autor:** Pablo
 **Trabajo de Fin de Grado** - Universidad de Valencia (UV)

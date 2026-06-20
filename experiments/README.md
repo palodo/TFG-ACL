@@ -1,6 +1,6 @@
 # Modelos Disponibles
 
-## 📙 Descripción de Notebooks
+## Descripción de Notebooks
 
 ### 1. ConvNeXt V2 Tiny (`convnext/convnext_baseline.ipynb`)
 
@@ -14,7 +14,7 @@
 
 **Resultados finales:**
 - Sagittal: AUC 0.9719, F1 0.8060
-- Coronal: AUC 0.9134, F1 0.7442  
+- Coronal: AUC 0.9134, F1 0.7442
 - Axial: AUC 0.9695, F1 0.7423
 - **Ensemble Val: AUC 0.9790**
 - **Ensemble Test: AUC 0.9251**
@@ -97,7 +97,7 @@ CHECKPOINT_DIR = Path('../../checkpoints/vit_optimized_pipeline')
 
 ---
 
-## 🔄 Flujo de ejecución (cualquier notebook)
+## Flujo de ejecución (cualquier notebook)
 
 1. **Configuración global** - Rutas, hiperparámetros por plano
 2. **Entrenamiento sagital** - Entrena modelo + visualiza curvas
@@ -108,7 +108,7 @@ CHECKPOINT_DIR = Path('../../checkpoints/vit_optimized_pipeline')
 7. **Calibración de threshold** - 3 opciones (MAX F1, MAX RECALL, MAX YOUDENS)
 8. **Metricas finales** - Confusion matrices, ROC curves, resumen
 
-## 📊 Comparación de modelos
+## Comparación de modelos
 
 | Métrica | ConvNeXt | Swin | ResNet50 | ViT |
 |---------|----------|------|----------|-----|
@@ -117,7 +117,7 @@ CHECKPOINT_DIR = Path('../../checkpoints/vit_optimized_pipeline')
 | Parámetros | 27.8M | 28M | 23M | 86M |
 | Velocidad | Rápido | Medio | Muy rápido | Lento |
 
-## 🎯 Recomendación
+## Recomendación
 
 **Para producción:** Usar **ConvNeXt V2 Tiny** (mejor AUC, pequeño tamaño, rápido)
 

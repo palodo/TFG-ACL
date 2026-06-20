@@ -2,11 +2,11 @@
 
 Thank you for your interest in contributing to the ACL Classifier project! This document provides guidelines and instructions for contributing.
 
-## 🎯 Code of Conduct
+## Code of Conduct
 
 We are committed to providing a welcoming and inspiring community for all. Please be respectful and constructive in all interactions.
 
-## 🐛 Reporting Issues
+## Reporting Issues
 
 Before creating a bug report, please check the issue list - your issue may already exist.
 
@@ -18,7 +18,7 @@ When reporting a bug, include:
 - **Logs/Error messages**: Full traceback if applicable
 - **Minimal example**: Minimal code to reproduce the issue
 
-## 💡 Suggesting Features
+## Suggesting Features
 
 Great ideas are always welcome! Before suggesting a new feature:
 
@@ -26,7 +26,7 @@ Great ideas are always welcome! Before suggesting a new feature:
 2. Explain the use case and why it would be beneficial
 3. Provide examples of how it would be used
 
-## 🔧 Development Setup
+## Development Setup
 
 ### 1. Fork and Clone
 
@@ -52,12 +52,12 @@ git checkout -b fix/bug-description
 ```
 
 Use descriptive branch names:
-- `feature/add-new-model` ✓
-- `fix/gpu-memory-leak` ✓
-- `docs/update-training-guide` ✓
-- `my-branch` ✗
+- `feature/add-new-model`
+- `fix/gpu-memory-leak`
+- `docs/update-training-guide`
+- `my-branch`
 
-## 📝 Code Style
+## Code Style
 
 We follow PEP 8 with these guidelines:
 
@@ -72,12 +72,12 @@ def train_model(
 ) -> Dict[str, List[float]]:
     """
     Train model on provided data.
-    
+
     Args:
         model: PyTorch model to train
         train_loader: DataLoader for training data
         num_epochs: Number of epochs to train
-        
+
     Returns:
         Dictionary with training history
     """
@@ -97,7 +97,7 @@ def train_model(
 - Constants: `UPPER_SNAKE_CASE`
 - Private members: `_single_leading_underscore`
 
-## 🧪 Testing
+## Testing
 
 Before submitting, test your changes:
 
@@ -114,7 +114,7 @@ For notebook changes, verify:
 - Output is deterministic or documented
 - Memory usage is reasonable
 
-## 📤 Submitting Changes
+## Submitting Changes
 
 ### 1. Commit Guidelines
 
@@ -146,12 +146,12 @@ git push origin feature/your-feature-name
 Then create a Pull Request on GitHub with:
 
 - **Clear title**: What does this PR do?
-- **Description**: 
+- **Description**:
   - Why is this change needed?
   - What problems does it solve?
   - Any breaking changes?
 - **Related issues**: Link to issues with `Closes #123`
-- **Type of change**: 
+- **Type of change**:
   - [ ] Bug fix
   - [ ] New feature
   - [ ] Breaking change
@@ -168,7 +168,7 @@ Before submitting, ensure:
 - [ ] Notebooks run without errors
 - [ ] Commit messages are clear and descriptive
 
-## 📋 Pull Request Process
+## Pull Request Process
 
 1. **Automated checks**: CI/CD pipeline runs tests and style checks
 2. **Code review**: Maintainers review your changes
@@ -176,7 +176,7 @@ Before submitting, ensure:
 4. **Approval**: PR is approved by maintainers
 5. **Merge**: Changes are merged to main branch
 
-## 🎓 Areas for Contribution
+## Areas for Contribution
 
 We especially welcome contributions in:
 
@@ -198,7 +198,7 @@ We especially welcome contributions in:
 - [ ] README updates
 - [ ] Issue triage
 
-## 📚 Documentation
+## Documentation
 
 When adding new features:
 
@@ -213,20 +213,20 @@ Docstring template:
 def your_function(param1: Type, param2: Type = default) -> ReturnType:
     """
     Brief description of what function does.
-    
+
     Longer description if needed, explaining the algorithm
     or any important details.
-    
+
     Args:
         param1: Description of param1
         param2: Description of param2, defaults to X
-        
+
     Returns:
         Description of return value
-        
+
     Raises:
         ValueError: When input is invalid
-        
+
     Example:
         >>> result = your_function(param1, param2)
         >>> print(result)
@@ -234,7 +234,7 @@ def your_function(param1: Type, param2: Type = default) -> ReturnType:
     pass
 ```
 
-## 🔄 Keeping Your Fork Updated
+## Keeping Your Fork Updated
 
 ```bash
 # Add upstream remote
@@ -246,20 +246,20 @@ git rebase upstream/main
 git push origin main
 ```
 
-## ❓ Questions?
+## Questions?
 
 - **Discussion**: Start a GitHub Discussion for questions
 - **Issues**: Use Issues for bug reports and features
 - **Documentation**: Check README and Training docs first
 
-## 📄 Additional Notes
+## Additional Notes
 
 - **Data sharing**: Do NOT commit large model weights or datasets
 - **Experiments**: Share results in Issues/Discussions, not in commits
 - **Breaking changes**: Must be discussed and approved
 - **Dependencies**: Minimize new dependencies, discuss first
 
-## 🙏 Thank You!
+## Thank You!
 
 Your contributions make this project better for everyone. We appreciate your help!
 

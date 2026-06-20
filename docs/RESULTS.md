@@ -242,9 +242,9 @@ F1:  0.7832 ± 0.0156 (95% CI)
 ### Pairwise Comparisons
 
 ```
-ViT-Tiny vs CNN-Base: AUC diff = +0.0400 (p=0.008) ✓ Significant
-ViT-Tiny vs ConvNeXt: AUC diff = -0.0131 (p=0.147) ✗ Not significant
-ViT-Tiny vs ViT-Base: AUC diff = -0.0167 (p=0.089) ✗ Not significant
+ViT-Tiny vs CNN-Base: AUC diff = +0.0400 (p=0.008)  Significant
+ViT-Tiny vs ConvNeXt: AUC diff = -0.0131 (p=0.147)  Not significant
+ViT-Tiny vs ViT-Base: AUC diff = -0.0167 (p=0.089)  Not significant
 ```
 
 ## Recommendations
