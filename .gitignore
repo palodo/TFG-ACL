@@ -86,5 +86,19 @@ app/uploads/
 node_modules/
 dist/
 *.log
-scratch/git_install/
+
+# Material de trabajo y de defensa (no se publica en el repo de código)
+scratch/
+defensa/
+defensa_html/
+paper/
+*.pptx
+
+# Ficheros sueltos heredados de versiones previas
+/defensa_TFG.html
+/defensa_TFG.pdf
+/tfg_secciones.tex
+/test_inference.json
+/VIT_ROC_test.png
+*.bak
 

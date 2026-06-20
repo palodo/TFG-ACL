@@ -1,0 +1,72 @@
+{
+  "case_id": 1,
+  "timestamp": "2026-05-21T18:40:59.585164",
+  "source": "Patient DICOM MRI",
+  "volume_shape_original": [
+    114,
+    512,
+    512
+  ],
+  "volume_shape_normalized": [
+    114,
+    512,
+    512
+  ],
+  "normalization": {
+    "method": "min-max to 8-bit",
+    "original_min": 0.0,
+    "original_max": 2000.0,
+    "target_range": [
+      0,
+      255
+    ]
+  },
+  "planes": {
+    "sagittal": {
+      "shape": [
+        512,
+        114,
+        512
+      ],
+      "dtype": "uint8",
+      "min": 0,
+      "max": 255
+    },
+    "coronal": {
+      "shape": [
+        512,
+        114,
+        512
+      ],
+      "dtype": "uint8",
+      "min": 0,
+      "max": 255
+    },
+    "axial": {
+      "shape": [
+        114,
+        512,
+        512
+      ],
+      "dtype": "uint8",
+      "min": 0,
+      "max": 255
+    }
+  },
+  "dicom_info": {
+    "num_slices": 114,
+    "slice_height": 512,
+    "slice_width": 512,
+    "bits_allocated": 16,
+    "sort_method": "SliceLocation"
+  },
+  "patient_info": {
+    "patient_name": "ALBEROLA GUILLOT^MARC",
+    "patient_id": "50393",
+    "patient_age": "023Y",
+    "patient_sex": "M",
+    "study_date": "20251007",
+    "modality": "MR",
+    "body_part": "KNEE"
+  }
+}

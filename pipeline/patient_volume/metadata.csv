@@ -1,0 +1,2 @@
+case_id,patient_name,patient_id,study_date,body_part,sagittal_shape,coronal_shape,axial_shape
+1,ALBEROLA GUILLOT^MARC,50393,20251007,KNEE,"(512, 114, 512)","(512, 114, 512)","(114, 512, 512)"
