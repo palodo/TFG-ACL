@@ -40,11 +40,11 @@ La Figura~\ref{fig:resnet_multiseed_training} muestra la evolución del entrenam
 \vspace{0.6em}
 
 \includegraphics[width=0.88\textwidth]{figs/outputs/CNN_axial_entrenamiento_multiseed.png}
-\caption{Evolución del entrenamiento multi-semilla de ResNet50 en los planos sagital, coronal y axial. Cada curva muestra la pérdida de entrenamiento y de validación a lo largo de las épocas.}
+\caption{Evolución del entrenamiento multi-semilla de ResNet50 en los planos sagital, coronal y axial. Cada figura recoge, de izquierda a derecha, la pérdida de entrenamiento y de validación, el AUC de entrenamiento y de validación, y el análisis de sobreajuste ---la brecha de AUC entre validación y entrenamiento (Val $-$ Train) en cada época---; las curvas representan la media $\pm$ desviación típica de las diez semillas.}
 \label{fig:resnet_multiseed_training}
 \end{figure}
 
-En estas curvas, la pérdida de entrenamiento desciende de forma sostenida mientras que la de validación se estabiliza y comienza a repuntar ligeramente a partir de aproximadamente la décima época, abriendo una brecha entre ambas que es la firma característica del sobreajuste. Este comportamiento justifica la estrategia de selección por \textit{early stopping} implícito: en lugar de conservar el último estado del modelo, se fija como checkpoint el de mejor AUC de validación, anterior al punto en que la brecha se ensancha. La dispersión entre semillas es coherente con lo observado en el boxplot, siendo más acusada en los planos sagital y coronal que en el axial.
+En estas curvas, la pérdida de entrenamiento desciende de forma sostenida mientras que la de validación se estabiliza y comienza a repuntar ligeramente a partir de aproximadamente la décima época, abriendo una brecha entre ambas que es la firma característica del sobreajuste. Este comportamiento justifica la estrategia de selección por \textit{early stopping} implícito: en lugar de conservar el último estado del modelo, se fija como checkpoint el de mejor AUC de validación, anterior al punto en que la brecha se ensancha. El tercer panel de cada figura cuantifica este efecto época a época mediante la brecha de AUC entre validación y entrenamiento (Val $-$ Train): una brecha próxima a cero indica ausencia de sobreajuste, mientras que valores cada vez más negativos reflejan que el modelo ajusta mejor el conjunto de entrenamiento que el de validación. En las tres arquitecturas esta brecha se mantiene en el orden de unas pocas centésimas de AUC, lo que confirma un sobreajuste contenido. La dispersión entre semillas es coherente con lo observado en el boxplot, siendo más acusada en los planos sagital y coronal que en el axial.
 
 % (fusionado en Rendimiento por vista)
 
@@ -172,7 +172,7 @@ La Figura~\ref{fig:vit_multiseed_training} muestra la evolución del entrenamien
 \vspace{0.6em}
 
 \includegraphics[width=0.88\textwidth]{figs/outputs/VIT_axial_entrenamiento_multiseed.png}
-\caption{Evolución del entrenamiento multi-semilla de ViT-Small en los planos sagital, coronal y axial. Cada curva muestra la pérdida de entrenamiento y de validación a lo largo de las épocas.}
+\caption{Evolución del entrenamiento multi-semilla de ViT-Small en los planos sagital, coronal y axial. Cada figura recoge, de izquierda a derecha, la pérdida de entrenamiento y de validación, el AUC de entrenamiento y de validación, y el análisis de sobreajuste ---la brecha de AUC entre validación y entrenamiento (Val $-$ Train) en cada época---; las curvas representan la media $\pm$ desviación típica de las diez semillas.}
 \label{fig:vit_multiseed_training}
 \end{figure}
 
@@ -307,7 +307,7 @@ La Figura~\ref{fig:swin_multiseed_training} muestra la evolución del entrenamie
 \vspace{0.6em}
 
 \includegraphics[width=0.88\textwidth]{figs/outputs/SWIN_axial_entrenamiento_multiseed.png}
-\caption{Evolución del entrenamiento multi-semilla de Swin-Tiny en los planos sagital, coronal y axial. Cada curva muestra la pérdida de entrenamiento y de validación a lo largo de las épocas.}
+\caption{Evolución del entrenamiento multi-semilla de Swin-Tiny en los planos sagital, coronal y axial. Cada figura recoge, de izquierda a derecha, la pérdida de entrenamiento y de validación, el AUC de entrenamiento y de validación, y el análisis de sobreajuste ---la brecha de AUC entre validación y entrenamiento (Val $-$ Train) en cada época---; las curvas representan la media $\pm$ desviación típica de las diez semillas.}
 \label{fig:swin_multiseed_training}
 \end{figure}
 
