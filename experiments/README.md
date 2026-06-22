@@ -33,6 +33,7 @@ familias:
 ## Estructura común de un notebook
 
 La configuración por plano (pooling, regularización) está al principio. El pooling entre cortes es
-*attention* en sagital y axial y *max* en coronal, igual en todas las arquitecturas. Después se
+*attention* en sagital y axial y *max* en coronal en ResNet50 y ViT-Small, y *attention* en los tres
+planos en Swin-Tiny. Después se
 entrena cada plano por separado, se cargan los tres modelos, se promedia el ensamble y se calibra el
 umbral de decisión sobre validación (recall máximo con precisión ≥ 0,75) antes de evaluar en test.

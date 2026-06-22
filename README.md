@@ -32,7 +32,8 @@ Se usan dos conjuntos, ninguno incluido en el repositorio por tamaño y licencia
 1. Selección de cortes por plano con un MobileNetV2 entrenado para puntuar relevancia anatómica
    (5 cortes en sagital, 10 en coronal; en axial se usan cortes centrales).
 2. Backbone por plano sobre los cortes seleccionados, con agregación entre cortes mediante
-   *attention pooling* en sagital y axial y *max pooling* en coronal.
+   *attention pooling* en sagital y axial y *max pooling* en coronal en ResNet50 y ViT-Small;
+   Swin-Tiny usa *attention pooling* en los tres planos.
 3. Ensamble multi-vista: media de las probabilidades de los tres planos.
 4. Umbral de decisión calibrado en validación (recall máximo con precisión ≥ 0,75).
 

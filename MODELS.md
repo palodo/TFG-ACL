@@ -42,4 +42,5 @@ contienen modelos Swin-Tiny pese a algún nombre heredado; la única Swin-Small 
 `swin_small_REAL_multiseed`.
 
 El pooling por plano debe coincidir con el del entrenamiento al cargar un checkpoint: *attention*
-en sagital y axial, *max* en coronal. Los notebooks de cada arquitectura ya lo configuran.
+en sagital y axial y *max* en coronal en ResNet50 y ViT-Small, y *attention* en los tres planos en
+Swin-Tiny. Los notebooks de cada arquitectura ya lo configuran.
