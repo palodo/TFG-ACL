@@ -1,9 +1,11 @@
 % Declaración responsable de uso de IA (ETSE-UV). Anexo tras la portada.
-% Datos objetivos prerellenos; herramientas, valoraciones y firma a completar por el autor.
+% Datos prerellenos; revisar las marcas y firmar antes de la entrega.
 \thispagestyle{empty}
 \begingroup
 \setlength{\parindent}{0pt}
 \footnotesize
+\newcommand{\sel}{$\boxtimes$}% casilla marcada
+\newcommand{\non}{$\square$}%  casilla vacía
 
 {\large\bfseries Declaración responsable de uso de Inteligencia Artificial (IA) --- ETSE-UV\par}
 \vspace{2pt}
@@ -19,7 +21,7 @@ Título del TFG/TFM: \textbf{Diagnóstico de lesiones de rodilla utilizando imá
 
 Declaro que en este trabajo he utilizado las siguientes herramientas de IA (si procede):\par
 \vspace{2pt}
-1.~Herramienta y versión: \underline{\hspace{10cm}}\par
+1.~Herramienta y versión: \textbf{Claude Code (Anthropic), modelo Claude Opus}\par
 2.~Herramienta y versión: \underline{\hspace{10cm}}\par
 3.~Herramienta y versión: \underline{\hspace{10cm}}\par
 4.~Herramienta y versión: \underline{\hspace{10cm}}\par
@@ -35,18 +37,18 @@ Declaro que en este trabajo he utilizado las siguientes herramientas de IA (si p
 \toprule
 \textbf{Dimensión} & 1 & 2 & 3 & 4 & 5 \\
 \midrule
-Corrección lingüística: ortografía, gramática, puntuación y coherencia formal del texto & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-Reescritura y mejora de estilo: reformulación para aumentar claridad, concisión y legibilidad manteniendo el significado & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-Síntesis de contenido: elaboración de resúmenes a partir de textos extensos o complejos para identificar ideas clave & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-Apoyo en la localización de referencias: propuesta de posibles fuentes (a verificar y citar correctamente) & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-Planificación del trabajo: propuesta de esquemas, índices o guiones iniciales para estructurar el documento & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-Mejora de la argumentación y la estructura: detección de huecos, redundancias o saltos lógicos y propuesta de reorganización & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-Programación (si procede): apoyo en el desarrollo, depuración u optimización de fragmentos de código puntuales & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-Programación (si procede): uso generalizado de herramientas de generación de código de forma autónoma a partir de especificaciones & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-Análisis de datos (si procede): ayuda exploratoria para limpieza preliminar, generación de hipótesis e identificación de patrones & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-Traducción o adaptación lingüística (si procede) & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-Soporte en material visual (si procede): ideas para figuras, tablas o gráficos y revisión de su explicación & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-Otros (especificar): \underline{\hspace{4cm}} & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
+Corrección lingüística: ortografía, gramática, puntuación y coherencia formal del texto & \non & \non & \non & \sel & \non \\
+Reescritura y mejora de estilo: reformulación para aumentar claridad, concisión y legibilidad manteniendo el significado & \non & \non & \non & \sel & \non \\
+Síntesis de contenido: elaboración de resúmenes a partir de textos extensos o complejos para identificar ideas clave & \non & \non & \sel & \non & \non \\
+Apoyo en la localización de referencias: propuesta de posibles fuentes (a verificar y citar correctamente) & \non & \sel & \non & \non & \non \\
+Planificación del trabajo: propuesta de esquemas, índices o guiones iniciales para estructurar el documento & \non & \non & \sel & \non & \non \\
+Mejora de la argumentación y la estructura: detección de huecos, redundancias o saltos lógicos y propuesta de reorganización & \non & \non & \sel & \non & \non \\
+Programación (si procede): apoyo en el desarrollo, depuración u optimización de fragmentos de código puntuales & \non & \non & \non & \sel & \non \\
+Programación (si procede): uso generalizado de herramientas de generación de código de forma autónoma a partir de especificaciones & \non & \non & \sel & \non & \non \\
+Análisis de datos (si procede): ayuda exploratoria para limpieza preliminar, generación de hipótesis e identificación de patrones & \non & \non & \non & \sel & \non \\
+Traducción o adaptación lingüística (si procede) & \sel & \non & \non & \non & \non \\
+Soporte en material visual (si procede): ideas para figuras, tablas o gráficos y revisión de su explicación & \non & \non & \non & \sel & \non \\
+Otros (especificar): \underline{\hspace{4cm}} & \sel & \non & \non & \non & \non \\
 \bottomrule
 \end{tabularx}
 
@@ -60,10 +62,10 @@ Otros (especificar): \underline{\hspace{4cm}} & $\square$ & $\square$ & $\square
 \toprule
 \textbf{Declaración} & 1 & 2 & 3 & 4 & 5 \\
 \midrule
-Las ideas principales, interpretaciones y análisis críticos del trabajo son propios. & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-El uso de IA no ha sustituido mis competencias básicas de investigación, redacción y razonamiento académico. & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-He revisado, contrastado e integrado críticamente cualquier contenido generado con IA antes de incorporarlo. & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
-He verificado la precisión y fiabilidad del contenido, incluyendo datos, afirmaciones y referencias bibliográficas. & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ \\
+Las ideas principales, interpretaciones y análisis críticos del trabajo son propios. & \non & \non & \non & \non & \sel \\
+El uso de IA no ha sustituido mis competencias básicas de investigación, redacción y razonamiento académico. & \non & \non & \non & \non & \sel \\
+He revisado, contrastado e integrado críticamente cualquier contenido generado con IA antes de incorporarlo. & \non & \non & \non & \non & \sel \\
+He verificado la precisión y fiabilidad del contenido, incluyendo datos, afirmaciones y referencias bibliográficas. & \non & \non & \non & \non & \sel \\
 \bottomrule
 \end{tabularx}
 
