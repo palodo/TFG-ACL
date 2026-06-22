@@ -145,9 +145,7 @@ def main():
         axes[r, 0].text(-0.20, 0.5, f'Caso {case}\n(p={prob:.2f})',
                         transform=axes[r, 0].transAxes, ha='center', va='center',
                         fontsize=12, fontweight='bold', rotation=90, color='#b00020')
-    fig.suptitle('Región de mayor saliencia (Swin-Tiny, plano sagital) sobre los tres falsos negativos comunes del test',
-                 fontsize=13, fontweight='bold')
-    fig.tight_layout(rect=[0.02, 0, 1, 0.96])
+    fig.tight_layout(rect=[0.02, 0, 1, 1])
     out = out_dir / 'fn_comunes_sagital_gradcam.png'
     fig.savefig(out, dpi=170, bbox_inches='tight', facecolor='white')
     plt.close(fig)
