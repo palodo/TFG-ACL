@@ -311,7 +311,7 @@ La Figura~\ref{fig:swin_multiseed_training} muestra la evolución del entrenamie
 \label{fig:swin_multiseed_training}
 \end{figure}
 
-Estas curvas hacen visible el fenómeno descrito: en el plano axial las trayectorias de validación de las distintas semillas se agrupan de forma compacta y descienden de manera estable, mientras que en el coronal aparecen semillas cuya pérdida de validación apenas mejora respecto al inicio —el modelo queda atrapado en la solución trivial— junto a otras que sí convergen. Donde la convergencia es correcta, la brecha entre entrenamiento y validación crece de forma contenida y el \textit{early stopping} fija el checkpoint antes de que el sobreajuste se acentúe; los casos no convergentes, en cambio, se descartan de forma natural al seleccionar por AUC de validación.
+Estas curvas hacen visible el fenómeno descrito: en el plano axial las trayectorias de validación de las distintas semillas se agrupan de forma compacta y descienden de manera estable, mientras que en el coronal aparecen semillas cuya pérdida de validación apenas mejora respecto al inicio ---el modelo queda atrapado en la solución trivial--- junto a otras que sí convergen. Donde la convergencia es correcta, la brecha entre entrenamiento y validación crece de forma contenida y el \textit{early stopping} fija el checkpoint antes de que el sobreajuste se acentúe; los casos no convergentes, en cambio, se descartan de forma natural al seleccionar por AUC de validación.
 
 % (fusionado en Rendimiento por vista)
 

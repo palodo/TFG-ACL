@@ -72,7 +72,7 @@ La configuración final utilizada fue:
     \item Plano axial: $K=10$ cortes centrales consecutivos.
 \end{itemize}
 
-Esta configuración se determinó de forma empírica sobre el conjunto de validación. Para el número de cortes $K$ se probaron valores en el rango de 3 a 15 por plano, observándose que valores bajos descartaban cortes con información útil y valores altos reintroducían ruido y redundancia sin mejorar el AUC; $K=5$ (sagital) y $K=10$ (coronal y axial) ofrecieron el mejor compromiso. En cuanto a la estrategia, la selección \textit{CNN-Based} superó de forma consistente a las alternativas \textit{Center} y \textit{Random} en los planos sagital y coronal, donde el LCA aparece de forma localizada. En el plano axial, en cambio, el selector aprendido no aportó mejora —al tratarse de un corte transversal el ligamento es visible de forma más homogénea a lo largo del volumen—, por lo que se optó por la selección geométrica de cortes centrales, más simple y reproducible.
+Esta configuración se determinó de forma empírica sobre el conjunto de validación. Para el número de cortes $K$ se probaron valores en el rango de 3 a 15 por plano, observándose que valores bajos descartaban cortes con información útil y valores altos reintroducían ruido y redundancia sin mejorar el AUC; $K=5$ (sagital) y $K=10$ (coronal y axial) ofrecieron el mejor compromiso. En cuanto a la estrategia, la selección \textit{CNN-Based} superó de forma consistente a las alternativas \textit{Center} y \textit{Random} en los planos sagital y coronal, donde el LCA aparece de forma localizada. En el plano axial, en cambio, el selector aprendido no aportó mejora ---al tratarse de un corte transversal el ligamento es visible de forma más homogénea a lo largo del volumen---, por lo que se optó por la selección geométrica de cortes centrales, más simple y reproducible.
 
 \section{Arquitecturas de aprendizaje profundo}
 
@@ -121,7 +121,7 @@ Las tres arquitecturas se entrenaron bajo un mismo protocolo, ajustando únicame
 
 Como técnicas de regularización comunes se utilizaron \textit{Dropout} (sobre la proyección de entrada del clasificador y sobre las capas densas), \textit{Label Smoothing} para evitar predicciones excesivamente confiadas y \textit{Early Stopping} monitorizando el AUC de validación. Estos parámetros se ajustaron de forma independiente para cada arquitectura y plano anatómico, en función de su sensibilidad al sobreajuste; los valores concretos se detallan en las tablas de cada modelo.
 
-Los valores de las Tablas~\ref{tab:regularizacion_cnn}, \ref{tab:regularizacion_vit} y \ref{tab:regularizacion_swin} no se fijaron de antemano, sino que se obtuvieron mediante una \textbf{búsqueda manual guiada} (\textit{coarse-to-fine}) sobre el conjunto de validación: partiendo de valores de referencia habituales para cada familia, se exploraron rangos de \textit{dropout} ($0.0$–$0.5$), \textit{label smoothing} ($0.0$–$0.25$) y paciencia de \textit{early stopping} ($10$–$40$ épocas), reteniendo en cada caso la combinación con mejor AUC de validación. No se empleó una búsqueda exhaustiva en rejilla por su elevado coste computacional (tres arquitecturas $\times$ tres planos $\times$ diez semillas); la exploración se concentró en los planos más inestables, especialmente el coronal.
+Los valores de las Tablas~\ref{tab:regularizacion_cnn}, \ref{tab:regularizacion_vit} y \ref{tab:regularizacion_swin} no se fijaron de antemano, sino que se obtuvieron mediante una \textbf{búsqueda manual guiada} (\textit{coarse-to-fine}) sobre el conjunto de validación: partiendo de valores de referencia habituales para cada familia, se exploraron rangos de \textit{dropout} ($0.0$--$0.5$), \textit{label smoothing} ($0.0$--$0.25$) y paciencia de \textit{early stopping} ($10$--$40$ épocas), reteniendo en cada caso la combinación con mejor AUC de validación. No se empleó una búsqueda exhaustiva en rejilla por su elevado coste computacional (tres arquitecturas $\times$ tres planos $\times$ diez semillas); la exploración se concentró en los planos más inestables, especialmente el coronal.
 
 \section{Redes Convolucionales}
 \label{sec:redes_convolucionales}
@@ -341,7 +341,7 @@ Axial &
 \section{Diseño experimental y evaluación}
 \label{sec:diseno_experimental}
 
-El objetivo de los experimentos es comparar, en igualdad de condiciones, las tres familias de modelos —\textit{ResNet50}, \textit{ViT-Small} y \textit{Swin-Tiny}— en la detección de roturas del LCA. Para cada arquitectura se sigue el mismo protocolo experimental:
+El objetivo de los experimentos es comparar, en igualdad de condiciones, las tres familias de modelos ---\textit{ResNet50}, \textit{ViT-Small} y \textit{Swin-Tiny}--- en la detección de roturas del LCA. Para cada arquitectura se sigue el mismo protocolo experimental:
 
 \begin{enumerate}
     \item \textbf{Entrenamiento por plano y estudio multi-semilla.} Se entrena un modelo independiente para cada plano (sagital, coronal y axial) y, para cada uno, se repite el entrenamiento con \textbf{diez semillas} independientes (42--51) con el fin de cuantificar la estabilidad frente a la inicialización.
@@ -368,7 +368,7 @@ La combinación multi-vista se realiza mediante el promedio simple de las probab
 \label{eq:ensemble_promedio}
 \end{equation}
 
-Este esquema no introduce parámetros adicionales. Se exploraron además otras estrategias de fusión —votación por máximo y promedio ponderado por el AUC de validación de cada plano—, pero ofrecieron resultados próximos al promedio simple sin una mejora consistente, por lo que se mantuvo este último por su simplicidad e interpretabilidad.
+Este esquema no introduce parámetros adicionales. Se exploraron además otras estrategias de fusión ---votación por máximo y promedio ponderado por el AUC de validación de cada plano---, pero ofrecieron resultados próximos al promedio simple sin una mejora consistente, por lo que se mantuvo este último por su simplicidad e interpretabilidad.
 
 \subsection{Métricas de evaluación}
 
