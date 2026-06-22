@@ -113,7 +113,7 @@ El trabajo original de \textit{MRNet} supuso un punto de partida fundamental en 
 y_{\text{pred}} = \max_{i \in \{1, \dots, S\}} \sigma(\mathbf{W}^T f_i + b)
 \end{equation}
 
-donde $f_i$ representa el vector de características del corte $i$ extraído por la red convolucional, $S$ es el número total de cortes del volumen, $\mathbf{W}$ y $b$ son los parámetros del clasificador final, y $\sigma$ representa la función de activación sigmoide.
+\noindent donde $f_i$ representa el vector de características del corte $i$ extraído por la red convolucional, $S$ es el número total de cortes del volumen, $\mathbf{W}$ y $b$ son los parámetros del clasificador final, y $\sigma$ representa la función de activación sigmoide.
 
 A partir de esta propuesta inicial, comenzaron a aparecer trabajos que exploraban arquitecturas convolucionales más profundas y eficientes, tales como la familia ResNet \cite{he2016deep} o EfficientNet. En general, las redes convolucionales poseen un fuerte \textbf{sesgo inductivo} de localidad espacial e invarianza a la traslación, lo que las hace especialmente eficaces para capturar detalles microestructurales como la textura fina, los bordes geométricos y la discontinuidad de las fibras del ligamento en cortes concretos de la imagen.
 
@@ -127,7 +127,7 @@ La evolución del procesamiento de imágenes condujo posteriormente a la adopci�
 \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
 \end{equation}
 
-donde $Q$ (consultas), $K$ (claves) y $V$ (valores) representan las proyecciones de los parches espaciales de entrada, y $d_k$ es la dimensión de las claves.
+\noindent donde $Q$ (consultas), $K$ (claves) y $V$ (valores) representan las proyecciones de los parches espaciales de entrada, y $d_k$ es la dimensión de las claves.
 
 La principal ventaja de ViT en la detección de lesiones del LCA es su capacidad para modelar relaciones contextuales globales de larga distancia, permitiendo asociar las características del ligamento con indicios colaterales distribuidos por toda la articulación de la rodilla \cite{dai2021transmed}.
 

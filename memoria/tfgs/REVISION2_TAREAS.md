@@ -34,4 +34,4 @@
 - [x] R4. Quitar "(obligatorio)" (era solo comentario LaTeX del resumen español)
 - [x] R5. Sin sangría tras ecuación cuando continúa la frase: `\noindent` en materiales (1) y metodología (3)
 - [x] R6. Mención breve de prueba sobre rodillas propias en Validación externa (redacción cualitativa, falta confirmar resultado real)
-- [ ] R7. Enlace a GitHub (código + memoria + app): aplazado por indicación del usuario ("de momento nada")
+- [x] R7. Enlace a GitHub (código + memoria + app): footnote con \url{https://github.com/palodo/TFG-ACL} en el ítem "Demostrador interactivo" de conclusiones
