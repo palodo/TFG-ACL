@@ -958,7 +958,7 @@ export default function App() {
                     ) : (
                       <>
                         <div className="compare-verdict">{r.prediction === 'ACL INJURY' ? 'ROTURA LCA' : 'SANO'}</div>
-                        <div className="compare-prob">{Math.round(r.ensemble_probability * 100)}%<span>prob. rotura</span></div>
+                        <div className="compare-prob">{Math.round((r.prediction === 'ACL INJURY' ? r.calibrated_confidence : 1 - r.calibrated_confidence) * 100)}%<span>confianza {r.prediction === 'ACL INJURY' ? 'de rotura' : 'de sano'}</span></div>
                         <div className="compare-planes">
                           {['sagittal', 'coronal', 'axial'].map((p) => (
                             <div key={p} className="compare-plane-row">
@@ -1550,7 +1550,7 @@ export default function App() {
                       ) : (
                         <>
                           <div className="compare-verdict">{r.prediction === 'ACL INJURY' ? 'ROTURA LCA' : 'SANO'}</div>
-                          <div className="compare-prob">{Math.round(r.ensemble_probability * 100)}%<span>prob. rotura</span></div>
+                          <div className="compare-prob">{Math.round((r.prediction === 'ACL INJURY' ? r.calibrated_confidence : 1 - r.calibrated_confidence) * 100)}%<span>confianza {r.prediction === 'ACL INJURY' ? 'de rotura' : 'de sano'}</span></div>
                           <div className="compare-planes">
                             {['sagittal', 'coronal', 'axial'].map((p) => (
                               <div key={p} className="compare-plane-row">
