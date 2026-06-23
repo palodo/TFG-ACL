@@ -1577,8 +1577,8 @@ export default function App() {
           )}
           {/* Top Row: Global Outcome & Patient Ficha Side-by-Side */}
           <div className="top-summary-row">
-            {/* Global Outcome Card */}
-            {!dynamicDiag ? (
+            {/* Global Outcome Card (oculto en modo Diagnóstico múltiple: ya está el panel de los 3) */}
+            {selectedModel !== 'multi' && (!dynamicDiag ? (
               <div className="outcome-card diagnosis-pulsing-card">
                 <div className="outcome-left">
                   <div className="outcome-badge" style={{ background: 'rgba(255, 255, 255, 0.05)', color: 'var(--color-text-secondary)', borderColor: 'var(--border-light)' }}>
@@ -1627,7 +1627,7 @@ export default function App() {
                   </div>
                 </div>
               </div>
-            )}
+            ))}
 
             {/* Patient Metadata Details */}
             <div className="side-card">
