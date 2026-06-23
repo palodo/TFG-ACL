@@ -4317,3 +4317,53 @@ body.light-theme .mri-tendon-hologram { stroke: rgba(15, 23, 42, 0.65) !importan
 /* Estado del sistema y badges con mejor contraste en claro */
 body.light-theme .model-status-indicator { color: #475569 !important; }
 
+
+/* ===== Casos de ejemplo (barra lateral derecha) ===== */
+.examples-rail{position:fixed;top:96px;right:14px;z-index:60;display:flex;flex-direction:column;gap:10px;width:184px}
+.examples-rail-title{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.6;padding-left:4px}
+.example-card{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;border-radius:12px;cursor:pointer;
+  background:rgba(20,28,44,.82);border:1px solid rgba(120,150,200,.22);color:inherit;text-align:left;
+  backdrop-filter:blur(6px);transition:transform .12s,border-color .12s,background .12s}
+.example-card:hover{transform:translateY(-1px);border-color:rgba(120,170,255,.55);background:rgba(28,40,64,.92)}
+.example-card-mark{flex:0 0 auto;display:grid;place-items:center;width:30px;height:30px;border-radius:8px;
+  background:linear-gradient(135deg,#2563eb,#0ea5e9);color:#fff;font-size:10px;font-weight:700;letter-spacing:.04em}
+.example-card-text{display:flex;flex-direction:column;min-width:0}
+.example-card-label{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.example-card-sub{font-size:10.5px;opacity:.6}
+
+/* ===== Modal comparativa de modelos ===== */
+.compare-overlay{position:fixed;inset:0;z-index:200;background:rgba(5,8,15,.66);
+  display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+.compare-modal{width:min(940px,96vw);max-height:92vh;overflow:auto;border-radius:18px;padding:22px 24px;
+  background:#0f1626;border:1px solid rgba(120,150,200,.22);box-shadow:0 24px 60px rgba(0,0,0,.55);color:#e8eef9}
+.compare-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.compare-head h2{margin:0;font-size:19px}
+.compare-head p{margin:3px 0 0;font-size:12.5px;opacity:.6}
+.compare-close{background:none;border:none;color:#9fb0cc;font-size:26px;line-height:1;cursor:pointer;padding:0 6px}
+.compare-close:hover{color:#fff}
+.compare-error{background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.4);color:#fca5a5;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px}
+.compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.compare-card{border-radius:14px;padding:16px;background:#131c2e;border:1px solid rgba(120,150,200,.18);min-height:188px}
+.compare-card.is-loading{opacity:.7}
+.compare-card.is-healthy{border-color:rgba(16,185,129,.5);box-shadow:inset 0 0 0 1px rgba(16,185,129,.18)}
+.compare-card.is-injury{border-color:rgba(239,68,68,.5);box-shadow:inset 0 0 0 1px rgba(239,68,68,.18)}
+.compare-card-name{font-size:13px;font-weight:700;letter-spacing:.04em;opacity:.85;margin-bottom:8px}
+.compare-card-loading{opacity:.6;font-size:13px;padding:24px 0;text-align:center}
+.compare-verdict{font-size:22px;font-weight:800;letter-spacing:.02em}
+.is-healthy .compare-verdict{color:#34d399}
+.is-injury .compare-verdict{color:#f87171}
+.compare-prob{font-size:26px;font-weight:800;margin:2px 0 12px}
+.compare-prob span{font-size:11px;font-weight:500;opacity:.55;margin-left:6px}
+.compare-plane-row{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:11.5px}
+.compare-plane-name{flex:0 0 48px;opacity:.7}
+.compare-bar{flex:1;height:7px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
+.compare-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#22c55e,#eab308,#ef4444)}
+.compare-plane-val{flex:0 0 34px;text-align:right;opacity:.8;font-variant-numeric:tabular-nums}
+.compare-thr{margin-top:10px;font-size:10.5px;opacity:.5;text-transform:uppercase;letter-spacing:.08em}
+.compare-consensus{margin-top:16px;text-align:center;font-size:15px;padding:12px;border-radius:12px;background:#131c2e;border:1px solid rgba(120,150,200,.2)}
+.compare-consensus.is-healthy{border-color:rgba(16,185,129,.5)}
+.compare-consensus.is-injury{border-color:rgba(239,68,68,.5)}
+.compare-consensus.is-healthy strong{color:#34d399}
+.compare-consensus.is-injury strong{color:#f87171}
+.compare-running{margin-top:10px;text-align:center;font-size:12px;opacity:.6}
+@media(max-width:760px){.compare-grid{grid-template-columns:1fr}.examples-rail{display:none}}

@@ -333,6 +333,60 @@ export default function App() {
   const [heatmapOpacity, setHeatmapOpacity] = useState(0.35);
   const [maskPatientData, setMaskPatientData] = useState(true);
 
+  // Vista comparativa de los 3 modelos + casos de ejemplo
+  const [examples, setExamples] = useState([]);
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [compareStatus, setCompareStatus] = useState('idle'); // idle, running, done, error
+  const [compareModels, setCompareModels] = useState({});
+  const [compareConsensus, setCompareConsensus] = useState(null);
+  const [comparePatient, setComparePatient] = useState(null);
+  const [compareLabel, setCompareLabel] = useState('');
+  const [compareError, setCompareError] = useState('');
+
+  useEffect(() => {
+    fetch('/api/examples').then((r) => r.json()).then((d) => setExamples(d.examples || [])).catch(() => {});
+  }, []);
+
+  const runComparison = (safeName, label) => {
+    setCompareOpen(true);
+    setCompareStatus('running');
+    setCompareModels({});
+    setCompareConsensus(null);
+    setComparePatient(null);
+    setCompareError('');
+    setCompareLabel(label || safeName);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/compare-existing');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    let lastLength = 0;
+    let buffer = '';
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 3 || xhr.readyState === 4) {
+        const txt = xhr.responseText;
+        buffer += txt.substring(lastLength);
+        lastLength = txt.length;
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          let d;
+          try { d = JSON.parse(line); } catch (e) { continue; }
+          if (d.error) { setCompareError(d.error); setCompareStatus('error'); xhr.abort(); return; }
+          if (d.type === 'patient_info') setComparePatient(d.patient_info);
+          else if (d.type === 'model_result') setCompareModels((prev) => ({ ...prev, [d.model]: d.result }));
+          else if (d.type === 'comparison') { setCompareConsensus(d.consensus); setComparePatient(d.patient_info); }
+        }
+      }
+      if (xhr.readyState === 4) {
+        if (xhr.status >= 200 && xhr.status < 300) setCompareStatus((s) => (s === 'error' ? s : 'done'));
+        else if (xhr.status !== 0) { setCompareError('Fallo en la comparativa de modelos.'); setCompareStatus('error'); }
+      }
+    };
+    xhr.onerror = () => { setCompareError('Error de red al conectar con el servidor.'); setCompareStatus('error'); };
+    xhr.send(JSON.stringify({ safeName }));
+  };
+
   // Theme state: default to 'dark' (negro por defecto)
   const [theme, setTheme] = useState('dark');
 
@@ -813,6 +867,77 @@ export default function App() {
 
   return (
     <div className="app-container">
+      {/* Barra lateral derecha: casos de ejemplo precargados */}
+      {examples.length > 0 && (
+        <aside className="examples-rail">
+          <div className="examples-rail-title">Casos</div>
+          {examples.map((ex) => (
+            <button key={ex.safeName} className="example-card" onClick={() => runComparison(ex.safeName, ex.label)}>
+              <span className="example-card-mark" aria-hidden="true">RM</span>
+              <span className="example-card-text">
+                <span className="example-card-label">{ex.label}</span>
+                <span className="example-card-sub">Comparar 3 modelos</span>
+              </span>
+            </button>
+          ))}
+        </aside>
+      )}
+
+      {/* Modal: comparativa de los 3 modelos */}
+      {compareOpen && (
+        <div className="compare-overlay" onClick={() => setCompareOpen(false)}>
+          <div className="compare-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="compare-head">
+              <div>
+                <h2>Comparativa de arquitecturas</h2>
+                <p>{compareLabel}{comparePatient && !maskPatientData ? ` · ${comparePatient.patient_name}` : ''}</p>
+              </div>
+              <button className="compare-close" onClick={() => setCompareOpen(false)} aria-label="Cerrar">×</button>
+            </div>
+
+            {compareError && <div className="compare-error">{compareError}</div>}
+
+            <div className="compare-grid">
+              {['cnn', 'vit', 'swin'].map((key) => {
+                const r = compareModels[key];
+                const names = { cnn: 'ResNet50', vit: 'ViT-Small', swin: 'Swin-Tiny' };
+                return (
+                  <div key={key} className={`compare-card ${r ? (r.prediction === 'ACL INJURY' ? 'is-injury' : 'is-healthy') : 'is-loading'}`}>
+                    <div className="compare-card-name">{names[key]}</div>
+                    {!r ? (
+                      <div className="compare-card-loading">Evaluando…</div>
+                    ) : (
+                      <>
+                        <div className="compare-verdict">{r.prediction === 'ACL INJURY' ? 'ROTURA LCA' : 'SANO'}</div>
+                        <div className="compare-prob">{Math.round(r.ensemble_probability * 100)}%<span>prob. rotura</span></div>
+                        <div className="compare-planes">
+                          {['sagittal', 'coronal', 'axial'].map((p) => (
+                            <div key={p} className="compare-plane-row">
+                              <span className="compare-plane-name">{p === 'sagittal' ? 'Sagital' : p === 'coronal' ? 'Coronal' : 'Axial'}</span>
+                              <div className="compare-bar"><div className="compare-bar-fill" style={{ width: `${Math.round((r.planes[p] || 0) * 100)}%` }} /></div>
+                              <span className="compare-plane-val">{Math.round((r.planes[p] || 0) * 100)}%</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="compare-thr">umbral clínico {Math.round(r.threshold * 100)}%</div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {compareConsensus && (
+              <div className={`compare-consensus ${compareConsensus.prediction === 'ACL INJURY' ? 'is-injury' : 'is-healthy'}`}>
+                Consenso: <strong>{compareConsensus.prediction === 'ACL INJURY' ? 'ROTURA DE LCA' : 'RODILLA SANA'}</strong>
+                <span> · {compareConsensus.votes_injury}/{compareConsensus.n_models} modelos indican rotura</span>
+              </div>
+            )}
+            {compareStatus === 'running' && <div className="compare-running">Procesando los tres modelos…</div>}
+          </div>
+        </div>
+      )}
+
       {/* Header section with branding */}
       <header className="app-header">
         <div className="brand-section">
