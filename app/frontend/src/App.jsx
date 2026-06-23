@@ -1538,31 +1538,35 @@ export default function App() {
                 <h3>Diagnóstico múltiple · comparativa de arquitecturas</h3>
                 {compareStatus === 'running' && <span className="multi-panel-status">evaluando los 3 modelos…</span>}
               </div>
-              <div className="compare-grid">
+              <div className="multi-rows">
                 {['cnn', 'vit', 'swin'].map((key) => {
                   const r = compareModels[key];
                   const names = { cnn: 'ResNet50', vit: 'ViT-Small', swin: 'Swin-Tiny' };
+                  const conf = r ? (r.prediction === 'ACL INJURY' ? r.calibrated_confidence : 1 - r.calibrated_confidence) : 0;
+                  const C = 2 * Math.PI * 34;
                   return (
-                    <div key={key} className={`compare-card ${r ? (r.prediction === 'ACL INJURY' ? 'is-injury' : 'is-healthy') : 'is-loading'}`}>
-                      <div className="compare-card-name">{names[key]}</div>
-                      {!r ? (
-                        <div className="compare-card-loading">Evaluando…</div>
-                      ) : (
-                        <>
-                          <div className="compare-verdict">{r.prediction === 'ACL INJURY' ? 'ROTURA LCA' : 'SANO'}</div>
-                          <div className="compare-prob">{Math.round((r.prediction === 'ACL INJURY' ? r.calibrated_confidence : 1 - r.calibrated_confidence) * 100)}%<span>confianza {r.prediction === 'ACL INJURY' ? 'de rotura' : 'de sano'}</span></div>
-                          <div className="compare-planes">
-                            {['sagittal', 'coronal', 'axial'].map((p) => (
-                              <div key={p} className="compare-plane-row">
-                                <span className="compare-plane-name">{p === 'sagittal' ? 'Sagital' : p === 'coronal' ? 'Coronal' : 'Axial'}</span>
-                                <div className="compare-bar"><div className="compare-bar-fill" style={{ width: `${Math.round((r.planes[p] || 0) * 100)}%` }} /></div>
-                                <span className="compare-plane-val">{Math.round((r.planes[p] || 0) * 100)}%</span>
-                              </div>
-                            ))}
+                    <div key={key} className={`multi-row ${r ? (r.prediction === 'ACL INJURY' ? 'is-injury' : 'is-healthy') : 'is-loading'}`}>
+                      <div className="multi-gauge">
+                        <svg width="84" height="84" viewBox="0 0 84 84">
+                          <circle className="multi-gauge-bg" cx="42" cy="42" r="34" />
+                          <circle className="multi-gauge-fill" cx="42" cy="42" r="34" strokeDasharray={C} strokeDashoffset={C * (1 - conf)} />
+                        </svg>
+                        <div className="multi-gauge-text">{r ? `${Math.round(conf * 100)}%` : '··'}</div>
+                      </div>
+                      <div className="multi-row-info">
+                        <div className="multi-row-name">{names[key]}</div>
+                        <div className="multi-row-verdict">{r ? (r.prediction === 'ACL INJURY' ? 'ROTURA LCA' : 'SANO') : 'Evaluando…'}</div>
+                        <div className="multi-row-sub">{r ? `confianza ${r.prediction === 'ACL INJURY' ? 'de rotura' : 'de sano'} · umbral ${Math.round(r.threshold * 100)}%` : ''}</div>
+                      </div>
+                      <div className="multi-row-planes">
+                        {['sagittal', 'coronal', 'axial'].map((p) => (
+                          <div key={p} className="compare-plane-row">
+                            <span className="compare-plane-name">{p === 'sagittal' ? 'Sagital' : p === 'coronal' ? 'Coronal' : 'Axial'}</span>
+                            <div className="compare-bar"><div className="compare-bar-fill" style={{ width: r ? `${Math.round((r.planes[p] || 0) * 100)}%` : '0%' }} /></div>
+                            <span className="compare-plane-val">{r ? `${Math.round((r.planes[p] || 0) * 100)}%` : ''}</span>
                           </div>
-                          <div className="compare-thr">umbral clínico {Math.round(r.threshold * 100)}%</div>
-                        </>
-                      )}
+                        ))}
+                      </div>
                     </div>
                   );
                 })}
