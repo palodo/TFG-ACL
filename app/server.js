@@ -13,8 +13,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Absolute path to virtual environment python interpreter and predict script
-const PYTHON_PATH = '/home/palodo2/acl_classifier/.venv/bin/python';
+const PYTHON_PATH = process.env.PYTHON_PATH || '/home/palodo2/acl_classifier/.venv/bin/python';
 const SCRIPT_PATH = path.resolve(__dirname, '../scripts/predict_patient.py');
+// Lightweight 3-model comparison script (no per-slice heatmaps)
+const COMPARE_SCRIPT = path.resolve(__dirname, '../scripts/compare_models.py');
 
 // Allowed model identifiers (whitelist)
 const ALLOWED_MODELS = new Set(['swin', 'vit', 'cnn']);
@@ -175,6 +177,53 @@ function runInference(zipPath, selectedModel, req, res, label) {
   });
 }
 
+/**
+ * Spawn the lightweight 3-model comparison pipeline and stream its NDJSON output.
+ */
+function runComparison(zipPath, req, res, label) {
+  if (inferenceBusy) {
+    res.setHeader('Content-Type', 'application/x-ndjson');
+    res.write(JSON.stringify({ error: 'El servidor está procesando otro estudio. Inténtelo en unos segundos.' }) + '\n');
+    return res.end();
+  }
+  inferenceBusy = true;
+  console.log(`[BFF Server] ${label}: ${zipPath} (comparativa 3 modelos)`);
+
+  res.setHeader('Content-Type', 'application/x-ndjson');
+  res.setHeader('Transfer-Encoding', 'chunked');
+
+  const pyProcess = spawn(PYTHON_PATH, [COMPARE_SCRIPT, '--zip', zipPath], {
+    shell: false,
+    env: { ...process.env, PYTHONUNBUFFERED: '1' }
+  });
+
+  res.on('close', () => {
+    if (!res.writableFinished && pyProcess.exitCode === null) {
+      pyProcess.kill('SIGTERM');
+    }
+  });
+
+  pyProcess.stdout.on('data', (data) => res.write(data));
+  pyProcess.stderr.on('data', (data) => console.error(`[BFF Server] compare stderr: ${data.toString()}`));
+
+  pyProcess.on('close', (code, signal) => {
+    inferenceBusy = false;
+    if (res.writableEnded) return;
+    if (code !== 0 && signal == null) {
+      res.write(JSON.stringify({ error: 'Falló la comparativa de modelos.' }) + '\n');
+    }
+    res.end();
+  });
+
+  pyProcess.on('error', (err) => {
+    inferenceBusy = false;
+    if (!res.writableEnded) {
+      res.write(JSON.stringify({ error: 'No se pudo iniciar la comparativa.' }) + '\n');
+      res.end();
+    }
+  });
+}
+
 function parseModel(value) {
   return ALLOWED_MODELS.has(value) ? value : 'swin';
 }
@@ -240,6 +289,40 @@ app.post('/api/analyze-existing', (req, res) => {
 
   const selectedModel = parseModel(req.body.model);
   runInference(zipPath, selectedModel, req, res, 'Re-analyze cached file');
+});
+
+// Comparison API (3 models at once) — fresh upload
+app.post('/api/compare', upload.single('dicomZip'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, error: 'No DICOM zip archive uploaded.' });
+  }
+  runComparison(req.file.path, req, res, 'Compare uploaded file');
+});
+
+// Comparison API (3 models at once) — already uploaded file
+app.post('/api/compare-existing', (req, res) => {
+  const { safeName } = req.body;
+  if (!safeName || typeof safeName !== 'string') {
+    return res.status(400).json({ success: false, error: 'safeName parameter is required.' });
+  }
+  const cleanName = sanitizeZipName(safeName);
+  const zipPath = path.join(UPLOAD_DIR, cleanName);
+  if (!zipPath.startsWith(UPLOAD_DIR) || !cleanName.endsWith('.zip')) {
+    return res.status(400).json({ success: false, error: 'Invalid path access or invalid file format.' });
+  }
+  if (!fs.existsSync(zipPath)) {
+    return res.status(404).json({ success: false, error: 'DICOM zip archive does not exist on server.' });
+  }
+  runComparison(zipPath, req, res, 'Compare cached file');
+});
+
+// List the bundled example studies available in the uploads directory
+app.get('/api/examples', (req, res) => {
+  const examples = [
+    { safeName: '2023.zip', label: 'Rodilla 2023 (sana)' },
+    { safeName: '2025-10-07-alberola-guillot-marc-rm-rodilla-izquierd.zip', label: 'Rodilla Alberola' }
+  ].filter(e => fs.existsSync(path.join(UPLOAD_DIR, e.safeName)));
+  res.json({ examples });
 });
 
 // Serve compiled frontend files from production build directory
