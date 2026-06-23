@@ -342,13 +342,15 @@ export default function App() {
   const [comparePatient, setComparePatient] = useState(null);
   const [compareLabel, setCompareLabel] = useState('');
   const [compareError, setCompareError] = useState('');
+  const [currentStudy, setCurrentStudy] = useState(null); // {safeName, label}
+  const [drawerOpen, setDrawerOpen] = useState(true); // cajón de casos abierto/cerrado
 
   useEffect(() => {
     fetch('/api/examples').then((r) => r.json()).then((d) => setExamples(d.examples || [])).catch(() => {});
   }, []);
 
-  const runComparison = (safeName, label) => {
-    setCompareOpen(true);
+  const runComparison = (safeName, label, asModal = true) => {
+    if (asModal) setCompareOpen(true);
     setCompareStatus('running');
     setCompareModels({});
     setCompareConsensus(null);
@@ -385,6 +387,20 @@ export default function App() {
     };
     xhr.onerror = () => { setCompareError('Error de red al conectar con el servidor.'); setCompareStatus('error'); };
     xhr.send(JSON.stringify({ safeName }));
+  };
+
+  // En modo "Diagnóstico múltiple": al terminar el análisis detallado (visor), lanza
+  // la comparativa de los 3 modelos y la muestra inline (sin modal).
+  useEffect(() => {
+    if (status === 'completed' && selectedModel === 'multi' && currentStudy?.safeName) {
+      runComparison(currentStudy.safeName, currentStudy.label, false);
+    }
+  }, [status, selectedModel, currentStudy]);
+
+  // Carga un caso del cajón (clic o arrastre al centro) y lo analiza
+  const loadExample = (safeName, label) => {
+    setCurrentStudy({ safeName, label: label || safeName });
+    analyzeExisting(safeName, { name: safeName, size: 0 });
   };
 
   // Theme state: default to 'dark' (negro por defecto)
@@ -477,6 +493,14 @@ export default function App() {
     e.stopPropagation();
     setDragActive(false);
 
+    // Caso arrastrado desde el cajón de la derecha
+    const caseName = e.dataTransfer.getData('application/x-acl-case');
+    if (caseName) {
+      const label = e.dataTransfer.getData('text/plain') || caseName;
+      loadExample(caseName, label);
+      return;
+    }
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const droppedFile = e.dataTransfer.files[0];
       if (droppedFile.name.endsWith('.zip')) {
@@ -529,6 +553,7 @@ export default function App() {
 
   // Run diagnostics on an already uploaded zip file (bypass upload UI completely)
   const analyzeExisting = (safeName, originalFile) => {
+    setCurrentStudy({ safeName, label: (originalFile && originalFile.name) || safeName });
     setStatus('analyzing');
     setErrorMsg('');
     setPatientInfo(null);
@@ -867,19 +892,43 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Barra lateral derecha: casos de ejemplo precargados */}
+      {/* Cajón deslizante de casos (arrastra un caso al centro para analizarlo) */}
       {examples.length > 0 && (
-        <aside className="examples-rail">
-          <div className="examples-rail-title">Casos</div>
-          {examples.map((ex) => (
-            <button key={ex.safeName} className="example-card" onClick={() => runComparison(ex.safeName, ex.label)}>
-              <span className="example-card-mark" aria-hidden="true">RM</span>
-              <span className="example-card-text">
-                <span className="example-card-label">{ex.label}</span>
-                <span className="example-card-sub">Comparar 3 modelos</span>
-              </span>
-            </button>
-          ))}
+        <aside className={`cases-drawer ${drawerOpen ? 'open' : 'closed'}`}>
+          <button
+            className="cases-drawer-handle"
+            onClick={() => setDrawerOpen((o) => !o)}
+            aria-label={drawerOpen ? 'Cerrar cajón de casos' : 'Abrir cajón de casos'}
+          >
+            <span className="cases-drawer-handle-text">CASOS</span>
+            <span className="cases-drawer-handle-arrow">{drawerOpen ? '›' : '‹'}</span>
+          </button>
+          <div className="cases-drawer-body">
+            <div className="cases-drawer-title">Casos de ejemplo</div>
+            <p className="cases-drawer-hint">Arrastra un caso al centro o púlsalo para analizarlo.</p>
+            {examples.map((ex) => (
+              <div
+                key={ex.safeName}
+                className="example-card"
+                role="button"
+                tabIndex={0}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData('application/x-acl-case', ex.safeName);
+                  e.dataTransfer.setData('text/plain', ex.label);
+                  e.dataTransfer.effectAllowed = 'copy';
+                }}
+                onClick={() => loadExample(ex.safeName, ex.label)}
+                onKeyDown={(e) => { if (e.key === 'Enter') loadExample(ex.safeName, ex.label); }}
+              >
+                <span className="example-card-mark" aria-hidden="true">RM</span>
+                <span className="example-card-text">
+                  <span className="example-card-label">{ex.label}</span>
+                  <span className="example-card-sub">{selectedModel === 'multi' ? 'Diagnóstico múltiple' : 'Analizar'}</span>
+                </span>
+              </div>
+            ))}
+          </div>
         </aside>
       )}
 
@@ -1042,6 +1091,22 @@ export default function App() {
                 <div className="model-option-stats">
                   <span>AUC test: 0.955</span>
                   <span>Sensibilidad: 88.4%</span>
+                </div>
+              </div>
+
+              <div
+                className={`model-option-card multi-option-card ${selectedModel === 'multi' ? 'active' : ''}`}
+                onClick={() => setSelectedModel('multi')}
+              >
+                <div className="model-option-header">
+                  <span className="model-badge multi-badge">Multi-Net</span>
+                  <span className="model-status-indicator">3 modelos</span>
+                </div>
+                <h5>Diagnóstico múltiple</h5>
+                <p>Ejecuta ResNet50, ViT-Small y Swin-Tiny sobre el mismo estudio y muestra los tres veredictos a la vez, junto al visor. Vista comparativa de arquitecturas.</p>
+                <div className="model-option-stats">
+                  <span>ResNet · ViT · Swin</span>
+                  <span>Consenso</span>
                 </div>
               </div>
             </div>
@@ -1466,6 +1531,50 @@ export default function App() {
       {/* Completed Dashboard Workspace */}
       {status === 'completed' && (
         <div className="workspace-container-fluid fade-in-up">
+          {/* Panel comparativo de los 3 modelos (modo Diagnóstico múltiple) */}
+          {selectedModel === 'multi' && (
+            <div className="multi-panel">
+              <div className="multi-panel-head">
+                <h3>Diagnóstico múltiple · comparativa de arquitecturas</h3>
+                {compareStatus === 'running' && <span className="multi-panel-status">evaluando los 3 modelos…</span>}
+              </div>
+              <div className="compare-grid">
+                {['cnn', 'vit', 'swin'].map((key) => {
+                  const r = compareModels[key];
+                  const names = { cnn: 'ResNet50', vit: 'ViT-Small', swin: 'Swin-Tiny' };
+                  return (
+                    <div key={key} className={`compare-card ${r ? (r.prediction === 'ACL INJURY' ? 'is-injury' : 'is-healthy') : 'is-loading'}`}>
+                      <div className="compare-card-name">{names[key]}</div>
+                      {!r ? (
+                        <div className="compare-card-loading">Evaluando…</div>
+                      ) : (
+                        <>
+                          <div className="compare-verdict">{r.prediction === 'ACL INJURY' ? 'ROTURA LCA' : 'SANO'}</div>
+                          <div className="compare-prob">{Math.round(r.ensemble_probability * 100)}%<span>prob. rotura</span></div>
+                          <div className="compare-planes">
+                            {['sagittal', 'coronal', 'axial'].map((p) => (
+                              <div key={p} className="compare-plane-row">
+                                <span className="compare-plane-name">{p === 'sagittal' ? 'Sagital' : p === 'coronal' ? 'Coronal' : 'Axial'}</span>
+                                <div className="compare-bar"><div className="compare-bar-fill" style={{ width: `${Math.round((r.planes[p] || 0) * 100)}%` }} /></div>
+                                <span className="compare-plane-val">{Math.round((r.planes[p] || 0) * 100)}%</span>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="compare-thr">umbral clínico {Math.round(r.threshold * 100)}%</div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              {compareConsensus && (
+                <div className={`compare-consensus ${compareConsensus.prediction === 'ACL INJURY' ? 'is-injury' : 'is-healthy'}`}>
+                  Consenso: <strong>{compareConsensus.prediction === 'ACL INJURY' ? 'ROTURA DE LCA' : 'RODILLA SANA'}</strong>
+                  <span> · {compareConsensus.votes_injury}/{compareConsensus.n_models} modelos indican rotura</span>
+                </div>
+              )}
+            </div>
+          )}
           {/* Top Row: Global Outcome & Patient Ficha Side-by-Side */}
           <div className="top-summary-row">
             {/* Global Outcome Card */}
