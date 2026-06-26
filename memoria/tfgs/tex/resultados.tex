@@ -29,17 +29,17 @@ El plano axial presentó simultáneamente el mayor AUC medio (0.9610) y la menor
 
 La Figura~\ref{fig:resnet_multiseed_training} muestra la evolución del entrenamiento multi-semilla de ResNet50 en los tres planos anatómicos.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
 \centering
-\includegraphics[width=0.88\textwidth]{figs/outputs/CNN_sagittal_entrenamiento_multiseed.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/CNN_sagittal_entrenamiento_multiseed.png}
 
-\vspace{0.6em}
+\vspace{0.3em}
 
-\includegraphics[width=0.88\textwidth]{figs/outputs/CNN_coronal_entrenamiento_multiseed.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/CNN_coronal_entrenamiento_multiseed.png}
 
-\vspace{0.6em}
+\vspace{0.3em}
 
-\includegraphics[width=0.88\textwidth]{figs/outputs/CNN_axial_entrenamiento_multiseed.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/CNN_axial_entrenamiento_multiseed.png}
 \caption{Evolución del entrenamiento multi-semilla de ResNet50 en los planos sagital, coronal y axial. Cada figura recoge, de izquierda a derecha, la pérdida de entrenamiento y de validación, el AUC de entrenamiento y de validación, y el análisis de sobreajuste ---la brecha de AUC entre validación y entrenamiento (Val $-$ Train) en cada época---; las curvas representan la media $\pm$ desviación típica de las diez semillas.}
 \label{fig:resnet_multiseed_training}
 \end{figure}
@@ -76,17 +76,17 @@ En la evaluación final sobre test, el plano sagital obtuvo el menor rendimiento
 
 La Figura~\ref{fig:resnet_best_training} recoge las curvas de entrenamiento de los checkpoints finalmente fijados por validación para cada plano.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
 \centering
-\includegraphics[width=0.88\textwidth]{figs/outputs/CNN_sagittal_best.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/CNN_sagittal_best.png}
 
-\vspace{0.6em}
+\vspace{0.3em}
 
-\includegraphics[width=0.88\textwidth]{figs/outputs/CNN_coronal_best.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/CNN_coronal_best.png}
 
-\vspace{0.6em}
+\vspace{0.3em}
 
-\includegraphics[width=0.88\textwidth]{figs/outputs/CNN_axial_best.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/CNN_axial_best.png}
 \caption{Curvas de entrenamiento de los mejores checkpoints de ResNet50 por plano anatómico.}
 \label{fig:resnet_best_training}
 \end{figure}
@@ -161,17 +161,17 @@ La sensibilidad de ViT-Small a la inicialización es coherente con la naturaleza
 
 La Figura~\ref{fig:vit_multiseed_training} muestra la evolución del entrenamiento multi-semilla de ViT-Small en los tres planos anatómicos.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
 \centering
-\includegraphics[width=0.88\textwidth]{figs/outputs/VIT_sagittal_entrenamiento_multiseed.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/VIT_sagittal_entrenamiento_multiseed.png}
 
-\vspace{0.6em}
+\vspace{0.3em}
 
-\includegraphics[width=0.88\textwidth]{figs/outputs/VIT_coronal_entrenamiento_multiseed.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/VIT_coronal_entrenamiento_multiseed.png}
 
-\vspace{0.6em}
+\vspace{0.3em}
 
-\includegraphics[width=0.88\textwidth]{figs/outputs/VIT_axial_entrenamiento_multiseed.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/VIT_axial_entrenamiento_multiseed.png}
 \caption{Evolución del entrenamiento multi-semilla de ViT-Small en los planos sagital, coronal y axial. Cada figura recoge, de izquierda a derecha, la pérdida de entrenamiento y de validación, el AUC de entrenamiento y de validación, y el análisis de sobreajuste ---la brecha de AUC entre validación y entrenamiento (Val $-$ Train) en cada época---; las curvas representan la media $\pm$ desviación típica de las diez semillas.}
 \label{fig:vit_multiseed_training}
 \end{figure}
@@ -253,17 +253,17 @@ En validación, el ensamble ViT-Small detectó las 36 roturas presentes sin ning
 
 La Figura~\ref{fig:vit_best_training} resume las curvas de mejores checkpoints de ViT-Small.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
 \centering
-\includegraphics[width=0.88\textwidth]{figs/outputs/VIT_sagittal_best.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/VIT_sagittal_best.png}
 
-\vspace{0.6em}
+\vspace{0.3em}
 
-\includegraphics[width=0.88\textwidth]{figs/outputs/VIT_coronal_best.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/VIT_coronal_best.png}
 
-\vspace{0.6em}
+\vspace{0.3em}
 
-\includegraphics[width=0.88\textwidth]{figs/outputs/VIT_axial_best.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/VIT_axial_best.png}
 \caption{Curvas de entrenamiento de los mejores checkpoints de ViT-Small por plano anatómico.}
 \label{fig:vit_best_training}
 \end{figure}
@@ -296,17 +296,17 @@ Por todo ello, la interpretación de Swin-Tiny debe basarse en el conjunto de ev
 
 La Figura~\ref{fig:swin_multiseed_training} muestra la evolución del entrenamiento multi-semilla de Swin-Tiny en los tres planos anatómicos.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
 \centering
-\includegraphics[width=0.88\textwidth]{figs/outputs/SWIN_sagittal_entrenamiento_multiseed.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/SWIN_sagittal_entrenamiento_multiseed.png}
 
-\vspace{0.6em}
+\vspace{0.3em}
 
-\includegraphics[width=0.88\textwidth]{figs/outputs/SWIN_coronal_entrenamiento_multiseed.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/SWIN_coronal_entrenamiento_multiseed.png}
 
-\vspace{0.6em}
+\vspace{0.3em}
 
-\includegraphics[width=0.88\textwidth]{figs/outputs/SWIN_axial_entrenamiento_multiseed.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/SWIN_axial_entrenamiento_multiseed.png}
 \caption{Evolución del entrenamiento multi-semilla de Swin-Tiny en los planos sagital, coronal y axial. Cada figura recoge, de izquierda a derecha, la pérdida de entrenamiento y de validación, el AUC de entrenamiento y de validación, y el análisis de sobreajuste ---la brecha de AUC entre validación y entrenamiento (Val $-$ Train) en cada época---; las curvas representan la media $\pm$ desviación típica de las diez semillas.}
 \label{fig:swin_multiseed_training}
 \end{figure}
@@ -319,17 +319,17 @@ A partir del análisis multi-semilla se fijaron los checkpoints utilizados en ca
 
 La Figura~\ref{fig:swin_best_training} recoge las curvas de entrenamiento de los checkpoints seleccionados para Swin-Tiny.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
 \centering
-\includegraphics[width=0.88\textwidth]{figs/outputs/SWIN_sagittal_best.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/SWIN_sagittal_best.png}
 
-\vspace{0.6em}
+\vspace{0.3em}
 
-\includegraphics[width=0.88\textwidth]{figs/outputs/SWIN_coronal_best.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/SWIN_coronal_best.png}
 
-\vspace{0.6em}
+\vspace{0.3em}
 
-\includegraphics[width=0.88\textwidth]{figs/outputs/SWIN_axial_best.png}
+\includegraphics[width=0.86\textwidth]{figs/outputs/SWIN_axial_best.png}
 \caption{Curvas de entrenamiento de los mejores checkpoints de Swin-Tiny por plano anatómico.}
 \label{fig:swin_best_training}
 \end{figure}
