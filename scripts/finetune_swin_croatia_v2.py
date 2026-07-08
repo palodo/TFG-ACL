@@ -212,13 +212,16 @@ def main():
         print(f'\n=== SEED {s} ===', flush=True)
         runs.append(train_one(s, args.epochs, args.freeze, args.lr_head, args.lr_bb, args.wd, args.patience))
 
-    # Ensamble por promedio de probabilidades (con TTA) sobre val y test
     ty = runs[0]['test_labels']; vy = runs[0]['val_labels']
-    ens_test = np.mean([r['test_probs'] for r in runs], axis=0)
-    ens_val = np.mean([r['val_probs'] for r in runs], axis=0)
 
-    thr = best_f1_threshold(vy, ens_val)
-    ens_metrics = metrics_at_thr(ty, ens_test, thr)
+    # RESULTADO REPORTADO: seleccionar el modelo por AUC de validación, medir test una vez.
+    selected = max(runs, key=lambda r: r['val_auc'])
+    sel_thr = best_f1_threshold(vy, selected['val_probs'])
+    sel_metrics = metrics_at_thr(ty, selected['test_probs'], sel_thr)
+
+    # Ensamble (solo referencia)
+    ens_test = np.mean([r['test_probs'] for r in runs], axis=0)
+    ens_metrics = metrics_at_thr(ty, ens_test, best_f1_threshold(vy, np.mean([r['val_probs'] for r in runs], axis=0)))
 
     per_seed = [{'seed': r['seed'], 'best_ep': r['best_ep'], 'val_auc': r['val_auc'],
                  'test_auc_tta': r['test_auc_tta']} for r in runs]
@@ -228,23 +231,25 @@ def main():
         'target_to_beat': 0.8993,
         'zero_shot_test_auc': 0.8968,
         'per_seed': per_seed,
+        'selected_by_val': {'seed': selected['seed'], 'val_auc': selected['val_auc'], **sel_metrics},
         'seed_test_auc_mean': float(np.mean(aucs)),
         'seed_test_auc_std': float(np.std(aucs)),
-        'seed_test_auc_best': float(np.max(aucs)),
-        'ensemble_test_metrics': ens_metrics,
+        'ensemble_test_metrics_reference': ens_metrics,
     }
     json.dump(summary, open(OUT / 'summary.json', 'w'), indent=2)
-    pd.DataFrame({'label': ty, 'prob': ens_test}).to_csv(OUT / 'ensemble_test_predictions.csv', index=False)
+    pd.DataFrame({'label': ty, 'prob': selected['test_probs']}).to_csv(OUT / 'selected_test_predictions.csv', index=False)
 
     print('\n' + '=' * 70)
     print('RESUMEN')
     print('=' * 70)
     for r in per_seed:
-        print(f"  seed {r['seed']}: val {r['val_auc']:.4f} | test(TTA) {r['test_auc_tta']:.4f}")
-    print(f"  media test = {summary['seed_test_auc_mean']:.4f} ± {summary['seed_test_auc_std']:.4f}")
-    print(f"  mejor seed  = {summary['seed_test_auc_best']:.4f}")
-    print(f"  ENSAMBLE test AUC = {ens_metrics['auc']:.4f} "
-          f"(rec={ens_metrics['recall']:.3f} prec={ens_metrics['precision']:.3f} thr={thr:.3f})")
+        mark = '  <= mejor val' if r['seed'] == selected['seed'] else ''
+        print(f"  seed {r['seed']}: val {r['val_auc']:.4f} | test(TTA) {r['test_auc_tta']:.4f}{mark}")
+    print(f"  >> SELECCIONADO POR VALIDACION: seed {selected['seed']} (val {selected['val_auc']:.4f}) "
+          f"-> TEST {sel_metrics['auc']:.4f} (rec={sel_metrics['recall']:.3f} "
+          f"prec={sel_metrics['precision']:.3f} thr={sel_thr:.3f})")
+    print(f"  estabilidad (media 5 semillas) = {summary['seed_test_auc_mean']:.4f} ± {summary['seed_test_auc_std']:.4f}")
+    print(f"  ensamble (solo referencia) = {ens_metrics['auc']:.4f}")
     print(f"  objetivo a batir = 0.8993 | zero-shot = 0.8968")
     print('=' * 70)
 
