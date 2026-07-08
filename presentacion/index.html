@@ -1287,6 +1287,36 @@ ul.feat li::before{content:"";position:absolute;left:0;top:.35em;width:16px;heig
       <div class="dnote">Selección por validación (mejor AUC de val) y test tocado una sola vez. La adaptación mejora el AUC sobre el punto de partida y es estable entre semillas (0.925–0.938), no un golpe de suerte.</div>
     </div>
 
+    <div class="dslide" data-d="ft_metrics">
+      <div class="tg">Diagnóstico · Croacia test (138 estudios: 104 sanas · 34 roturas) · umbral F1-máx en validación</div><h3>Croacia: el <span class="grad">detalle</span> tras adaptar</h3>
+      <table class="tbl" style="font-size:1.05rem;max-width:1000px;margin:14px auto 0">
+        <thead><tr><th>Swin-Tiny sagital</th><th>AUC</th><th>Exactitud</th><th>Precisión</th><th>Sensib.</th><th>Especif.</th><th>F1</th></tr></thead>
+        <tbody>
+          <tr><td>Zero-shot</td><td>0.897</td><td>0.841</td><td>0.658</td><td>0.735</td><td>0.875</td><td>0.694</td></tr>
+          <tr><td><span class="pill s">Fine-tuning</span></td><td class="best">0.935</td><td class="best">0.877</td><td class="best">0.718</td><td class="best">0.824</td><td class="best">0.894</td><td class="best">0.767</td></tr>
+        </tbody>
+      </table>
+      <div class="cmset" style="grid-template-columns:repeat(2,1fr);max-width:720px">
+        <div class="cmcard">
+          <div class="cmh"><span class="pill s" style="opacity:.65">Zero-shot</span></div>
+          <div class="cm">
+            <div></div><div class="hd">pred. sano</div><div class="hd">pred. rotura</div>
+            <div class="sd">real sano</div><div class="cmcell tn"><b>91</b><span>Verdad. neg.</span></div><div class="cmcell fp"><b>13</b><span>Falso pos.</span></div>
+            <div class="sd">real rotura</div><div class="cmcell fn"><b>9</b><span>Falso neg.</span></div><div class="cmcell tp"><b>25</b><span>Verdad. pos.</span></div>
+          </div>
+        </div>
+        <div class="cmcard">
+          <div class="cmh"><span class="pill s">Fine-tuning</span></div>
+          <div class="cm">
+            <div></div><div class="hd">pred. sano</div><div class="hd">pred. rotura</div>
+            <div class="sd">real sano</div><div class="cmcell tn"><b>93</b><span>Verdad. neg.</span></div><div class="cmcell fp"><b>11</b><span>Falso pos.</span></div>
+            <div class="sd">real rotura</div><div class="cmcell fn"><b>6</b><span>Falso neg.</span></div><div class="cmcell tp"><b>28</b><span>Verdad. pos.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="dnote">El fine-tuning sube la sensibilidad de 0.735 a 0.824: detecta 28 de las 34 roturas (antes 25) y reduce los falsos negativos de 9 a 6, con un falso positivo menos. Es la métrica crítica: el falso negativo es el error más caro.</div>
+    </div>
+
     <div class="dslide" data-d="explica">
       <div class="tg">Diagnóstico · transparencia y explicabilidad</div><h3>El mismo <span class="grad">foco anatómico</span></h3>
       <p class="dp">Grad-CAM en ResNet50, mapas de atención en ViT-Small y saliencia en Swin-Tiny coinciden en la escotadura intercondílea: las tres familias miran la región anatómica correcta del ligamento.</p>
@@ -2187,6 +2217,7 @@ function archStepper(svg, ids, steps, setFn){
     {d:'croacia', cam:'umbral'},
     {d:'externa', cam:'umbral'},
     {d:'finetune', cam:'umbral'},
+    {d:'ft_metrics', cam:'umbral'},
     {d:'explica', cam:'salida'},
     {map:1, cam:'overview'}
   ];
