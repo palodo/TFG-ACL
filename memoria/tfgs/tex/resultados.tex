@@ -662,7 +662,7 @@ En la evaluación externa, Swin-Tiny obtuvo el mayor AUC, con 0.8821, mientras q
 
 Para analizar la adaptación al nuevo dominio, se realizó \textit{fine-tuning} sobre el conjunto de Croacia.
 
-El modelo utilizado para este experimento fue Swin-Tiny en el plano sagital. La configuración de entrenamiento incluyó una tasa de aprendizaje inicial de $2 \times 10^{-4}$, pérdida BCE con \texttt{pos\_weight} = 3.0314 para compensar el desbalance de clases, \textit{dropout} de 0.3 en la entrada del clasificador y \textit{dropout} de 0.2 en la capa densa final. Durante las dos primeras épocas se mantuvo congelado el \textit{backbone}, entrenando únicamente la cabecera clasificadora. A partir de la tercera época se realizó ajuste completo de los pesos del modelo, con reducción de la tasa de aprendizaje en caso de estancamiento.
+El modelo utilizado para este experimento fue Swin-Tiny en el plano sagital. Se partió del modelo entrenado en MRNet y se reajustó con datos de Croacia empleando pérdida BCE con \texttt{pos\_weight} = 3.03 para compensar el desbalance de clases. Durante las tres primeras épocas se mantuvo congelado el \textit{backbone}, entrenando únicamente la cabecera clasificadora; a partir de la cuarta se realizó ajuste completo con tasas de aprendizaje diferenciadas ($3 \times 10^{-5}$ para el \textit{backbone} y $3 \times 10^{-4}$ para la cabecera) y planificación por \textit{cosine annealing}. Para asegurar la robustez del resultado se entrenaron cinco semillas: se seleccionó el modelo con mayor AUC en la partición de validación de Croacia y su rendimiento se evaluó una única vez sobre el subconjunto de prueba, aplicando \textit{test-time augmentation} por volteo horizontal.
 
 Una vez realizada la validación externa \textit{zero-shot} sobre el conjunto completo de Croacia, se creó una partición específica de entrenamiento, validación y prueba para adaptar el modelo al nuevo dominio. El rendimiento antes y después del ajuste se evaluó sobre el subconjunto de prueba de Croacia, no sobre MRNet. Los resultados principales se muestran en la Tabla~\ref{tab:fine_tuning_croacia_test}.
 
@@ -679,14 +679,14 @@ Una vez realizada la validación externa \textit{zero-shot} sobre el conjunto co
 \textbf{Evaluación en Croacia test} &
 \textbf{AUC} \\
 \midrule
-Antes del fine-tuning  & 0.9236 \\
-Después del fine-tuning & 0.9362 \\
-Diferencia & +0.0126 \\
+Antes del fine-tuning (\textit{zero-shot}) & 0.897 \\
+Después del fine-tuning & 0.935 \\
+Diferencia & +0.038 \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-Tras el \textit{fine-tuning}, el AUC sobre el test de Croacia aumentó de 0.9236 a 0.9362. Por tanto, el ajuste con datos del nuevo dominio produjo una mejora moderada en la capacidad discriminativa del modelo sagital. Esta comparación debe interpretarse separadamente de la validación \textit{zero-shot} anterior: primero se evaluó la transferencia directa sobre Croacia sin entrenamiento adicional y, posteriormente, se evaluó el efecto de adaptar el modelo utilizando las particiones de entrenamiento y validación de Croacia.
+Tras el \textit{fine-tuning}, el AUC sobre el test de Croacia aumentó de 0.897 a 0.935. Por tanto, el ajuste con datos del nuevo dominio produjo una mejora en la capacidad discriminativa del modelo sagital. El valor de partida (0.897) corresponde a la transferencia directa \textit{zero-shot} sobre este mismo subconjunto de prueba de Croacia y difiere ligeramente del AUC sobre el conjunto externo completo (0.882), por tratarse de una partición distinta. Esta comparación debe interpretarse separadamente de la validación \textit{zero-shot} anterior: primero se evaluó la transferencia directa sobre Croacia sin entrenamiento adicional y, posteriormente, se evaluó el efecto de adaptar el modelo utilizando las particiones de entrenamiento y validación de Croacia.
 
 Las curvas asociadas al ajuste fino no se incorporan como figuras principales porque la conclusión relevante queda resumida por la comparación antes/después del AUC. Su función es comprobar la dinámica de entrenamiento y la ausencia de inestabilidades evidentes, por lo que se consideran material complementario.
 
