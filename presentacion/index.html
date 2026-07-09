@@ -611,6 +611,14 @@ ul.feat li::before{content:"";position:absolute;left:0;top:.35em;width:16px;heig
 .concl h4{font-size:1.04rem;color:var(--ink);font-weight:800;margin-bottom:4px}
 .concl p{font-size:.9rem;color:var(--muted);line-height:1.4}
 @media(max-width:820px){.concl{grid-template-columns:1fr}}
+.cixcol{display:grid;grid-template-columns:1fr 1fr;gap:54px;margin-top:26px}
+.cixcol h3{font-size:1.12rem;font-weight:850;margin-bottom:14px}
+.clist{list-style:none;display:flex;flex-direction:column;gap:13px}
+.clist li{font-size:.98rem;color:var(--muted);line-height:1.42;padding-left:18px;position:relative}
+.clist li::before{content:"";position:absolute;left:0;top:.5em;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.clist.lim li::before{background:var(--accent3)}
+.clist li b{color:var(--ink);font-weight:800}
+@media(max-width:820px){.cixcol{grid-template-columns:1fr;gap:30px}}
 /* model family header row (question slide) — visual, param-driven */
 .families{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:38px}
 .fam{border:1px solid var(--line);border-radius:20px;padding:26px 24px;background:var(--card);
@@ -1275,21 +1283,8 @@ ul.feat li::before{content:"";position:absolute;left:0;top:.35em;width:16px;heig
     </div>
 
     <div class="dslide" data-d="finetune">
-      <div class="tg">Diagnóstico · adaptación de dominio · fine-tuning en Croacia</div><h3>Reentrenar en el <span class="grad">nuevo dominio</span></h3>
-      <p class="dp" style="max-width:64ch">Se reajusta Swin-Tiny sagital con datos de Croacia (641 train · 138 val · 138 test): congela el backbone unas épocas y luego ajuste completo con LR discriminativo. El modelo se elige por AUC de validación y se evalúa una sola vez en test.</p>
-      <div class="ftba">
-        <div class="ftnum before"><div class="lbl">Antes · zero-shot</div><div class="big">0.897</div></div>
-        <div class="ftarrow"><div class="ar">→</div><div class="dl">+0.038</div></div>
-        <div class="ftnum after"><div class="lbl">Tras fine-tuning</div><div class="big">0.935</div></div>
-      </div>
-      <div class="ftcap">AUC en el test held-out de Croacia (138 casos) · Swin-Tiny sagital · modelo seleccionado por validación</div>
-      <div class="chips2" style="margin-top:20px"><span class="c2" style="background:#07b3a0">congela 3 épocas → ajuste completo</span><span class="c2" style="background:#2f6bff">pos_weight 3.0 · desbalance</span><span class="c2" style="background:#7c3aed">estable entre semillas (0.925–0.938)</span></div>
-      <div class="dnote">Selección por validación (mejor AUC de val) y test tocado una sola vez. La adaptación mejora el AUC sobre el punto de partida y es estable entre semillas (0.925–0.938), no un golpe de suerte.</div>
-    </div>
-
-    <div class="dslide" data-d="ft_metrics">
-      <div class="tg">Diagnóstico · Croacia test (138 estudios: 104 sanas · 34 roturas) · umbral F1-máx en validación</div><h3>Croacia: el <span class="grad">detalle</span> tras adaptar</h3>
-      <table class="tbl" style="font-size:1.05rem;max-width:1000px;margin:14px auto 0">
+      <div class="tg">Diagnóstico · fine-tuning del Swin-Tiny sagital en Croacia · test 138 (104 sanas · 34 roturas) · modelo elegido por validación</div><h3>Reentrenar en el <span class="grad">nuevo dominio</span></h3>
+      <table class="tbl" style="font-size:1.08rem;max-width:1000px;margin:18px auto 0">
         <thead><tr><th>Swin-Tiny sagital</th><th>AUC</th><th>Exactitud</th><th>Precisión</th><th>Sensib.</th><th>Especif.</th><th>F1</th></tr></thead>
         <tbody>
           <tr><td>Zero-shot</td><td>0.897</td><td>0.841</td><td>0.658</td><td>0.735</td><td>0.875</td><td>0.694</td></tr>
@@ -1314,7 +1309,7 @@ ul.feat li::before{content:"";position:absolute;left:0;top:.35em;width:16px;heig
           </div>
         </div>
       </div>
-      <div class="dnote">El fine-tuning sube la sensibilidad de 0.735 a 0.824: detecta 28 de las 34 roturas (antes 25) y reduce los falsos negativos de 9 a 6, con un falso positivo menos. Es la métrica crítica: el falso negativo es el error más caro.</div>
+      <div class="dnote">El fine-tuning sube el AUC de 0.897 a 0.935 y la sensibilidad de 0.735 a 0.824: detecta 28 de las 34 roturas (antes 25) y baja los falsos negativos de 9 a 6, el error clínico más caro.</div>
     </div>
 
     <div class="dslide" data-d="explica">
@@ -1364,34 +1359,29 @@ ul.feat li::before{content:"";position:absolute;left:0;top:.35em;width:16px;heig
 </section>
 
 <!-- 13 CONCLUSIONS -->
-<section class="scene" id="limitaciones" data-name="Limitaciones">
-  <div class="blob b"></div><div class="blob c"></div>
-  <div class="scene-inner">
-    <div class="kicker r">Alcance y cautelas</div>
-    <h2 class="r d1">Qué <span class="grad">no</span> demuestra el trabajo</h2>
-    <div class="concl r d2">
-      <div class="item"><span class="n">01</span><div><h4>Test propio, no el oculto de Stanford</h4><p>La evaluación final es sobre una partición propia (187 estudios), no el <i>hidden test</i> oficial: no es directamente comparable con las cifras de la literatura.</p></div></div>
-      <div class="item"><span class="n">02</span><div><h4>Test moderado y con etiquetas ruidosas</h4><p>Solo 43 roturas en test: intervalos amplios. Los tres falsos negativos comunes reciben probabilidad muy baja → casos difíciles o de etiquetado dudoso.</p></div></div>
-      <div class="item"><span class="n">03</span><div><h4>Validación externa estrecha</h4><p>Un único centro externo (Rijeka), evaluado solo en el plano <b>sagital</b> y con roturas parciales incluidas; la sensibilidad cae (cambio de dominio real).</p></div></div>
-      <div class="item"><span class="n">04</span><div><h4>Selección de cortes parcial y fusión ingenua</h4><p>El plano axial usa cortes centrales fijos, no el selector aprendido. Los tres planos se combinan por promedio simple, sin ponderar ni modelado 3D.</p></div></div>
-      <div class="item"><span class="n">05</span><div><h4>Explicabilidad sin validar clínicamente</h4><p>Los mapas Grad-CAM y de atención no se han contrastado con anotaciones de especialistas ni con un radiólogo de referencia.</p></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- 13 CONCLUSIONS -->
 <section class="scene" id="conclusiones" data-name="Conclusiones">
   <div class="blob c"></div><div class="blob t"></div>
   <div class="scene-inner">
     <div class="kicker r">Conclusiones</div>
-    <h2 class="r d1">Qué demuestra el trabajo</h2>
-    <div class="concl r d2">
-      <div class="item"><span class="n">01</span><div><h4>El enfoque end-to-end es viable</h4><p>Sin segmentación explícita, las tres arquitecturas alcanzan un AUC en torno a 0.95 en el test interno de MRNet.</p></div></div>
-      <div class="item"><span class="n">02</span><div><h4>No hay un ganador absoluto</h4><p>ResNet50 lidera en AUC (0.9545), ViT-Small en precisión, especificidad y F1, y Swin-Tiny en sensibilidad (0.907), interesante para cribado.</p></div></div>
-      <div class="item"><span class="n">03</span><div><h4>La capacidad no es el factor limitante</h4><p>Las variantes compactas igualan o superan a las grandes: ViT-Small bate a ViT-Base (86 M) y Swin-Small (49 M) ni converge.</p></div></div>
-      <div class="item"><span class="n">04</span><div><h4>El análisis multi-semilla es imprescindible</h4><p>Diez semillas por plano revelan una variabilidad notable, sobre todo en el coronal: una sola ejecución engaña.</p></div></div>
-      <div class="item"><span class="n">05</span><div><h4>La fusión multi-vista suma sin coste</h4><p>El promedio de los tres planos mejora de forma consistente sobre los modelos individuales, sin parámetros adicionales.</p></div></div>
-      <div class="item"><span class="n">06</span><div><h4>El cambio de dominio es real</h4><p>La validación externa cae en sensibilidad; el fine-tuning y la calibración por centro recuperan parte del rendimiento.</p></div></div>
+    <h2 class="r d1">Qué <span class="grad">demuestra</span> y qué no</h2>
+    <div class="cixcol r d2">
+      <div>
+        <h3 style="color:var(--accent)">Qué demuestra</h3>
+        <ul class="clist">
+          <li><b>Enfoque end-to-end viable.</b> Sin segmentación, AUC ≈ 0.95 en el test interno de MRNet.</li>
+          <li><b>Sin ganador único.</b> ResNet en AUC, ViT en precisión y F1, Swin en sensibilidad; y las compactas igualan a las grandes.</li>
+          <li><b>Rigor multi-semilla.</b> Una sola ejecución engaña; la fusión multi-vista mejora sin coste añadido.</li>
+          <li><b>Adaptación de dominio.</b> El cambio de dominio es real, pero el fine-tuning recupera sensibilidad (Croacia 0.897 → 0.935).</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:var(--accent3)">Qué no (límites)</h3>
+        <ul class="clist lim">
+          <li><b>Evaluación acotada.</b> Partición propia (no el <i>hidden test</i> de Stanford) y test moderado (43 roturas).</li>
+          <li><b>Validación externa estrecha.</b> Un único centro (Rijeka) y solo el plano sagital.</li>
+          <li><b>Piezas mejorables.</b> Selección de cortes parcial, fusión por promedio y explicabilidad sin validar clínicamente.</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
@@ -2217,7 +2207,6 @@ function archStepper(svg, ids, steps, setFn){
     {d:'croacia', cam:'umbral'},
     {d:'externa', cam:'umbral'},
     {d:'finetune', cam:'umbral'},
-    {d:'ft_metrics', cam:'umbral'},
     {d:'explica', cam:'salida'},
     {map:1, cam:'overview'}
   ];
