@@ -494,15 +494,15 @@ ul.feat li::before{content:"";position:absolute;left:0;top:.35em;width:16px;heig
 .selstrats .st p{color:var(--muted);font-size:.86rem;margin-top:5px}
 @media(max-width:900px){.selarrow{transform:rotate(90deg)}.selpick{flex-wrap:wrap}}
 /* animated slice selector: score sweep -> informative slices light up & grow, noise dims & shrinks */
-.selfilm{position:relative;display:flex;justify-content:center;align-items:flex-end;gap:11px;margin:24px auto 4px;max-width:min(1500px,96vw);padding:26px 6px 10px}
-.selfilm .frame{position:relative;width:96px;display:flex;flex-direction:column;gap:7px;align-items:center;border:2px solid var(--line2);border-radius:11px;padding:7px;background:var(--card);transform-origin:bottom center;box-shadow:0 6px 16px -10px rgba(20,45,90,.4)}
-.selfilm .frame img{width:84px;height:68px;object-fit:cover;border-radius:7px;border:1px solid var(--line2);background:#0a1726;filter:contrast(1.1)}
-.selfilm .frame .fbar{width:100%;height:9px;border-radius:999px;background:#dde6f2;overflow:hidden}
+.selfilm{position:relative;display:flex;justify-content:center;align-items:flex-end;gap:13px;margin:28px auto 4px;max-width:min(1680px,97vw);padding:34px 6px 12px}
+.selfilm .frame{position:relative;width:122px;display:flex;flex-direction:column;gap:8px;align-items:center;border:2px solid var(--line2);border-radius:13px;padding:9px;background:var(--card);transform-origin:bottom center;box-shadow:0 6px 16px -10px rgba(20,45,90,.4)}
+.selfilm .frame img{width:106px;height:86px;object-fit:cover;border-radius:8px;border:1px solid var(--line2);background:#0a1726;filter:contrast(1.1)}
+.selfilm .frame .fbar{width:100%;height:10px;border-radius:999px;background:#dde6f2;overflow:hidden}
 .selfilm .frame .fbar i{display:block;height:100%;width:100%;border-radius:999px;background:linear-gradient(90deg,#8aa0c4,#aab6c8);transform:scaleX(0);transform-origin:left}
 .selfilm .frame.on .fbar i{background:linear-gradient(90deg,#069485,var(--accent))}
-.selfilm .frame .fsc{font-size:.92rem;font-weight:850;color:var(--muted);font-variant-numeric:tabular-nums}
+.selfilm .frame .fsc{font-size:1.02rem;font-weight:850;color:var(--muted);font-variant-numeric:tabular-nums}
 .selfilm .frame.on .fsc{color:var(--accent)}
-.selfilm .scanbar{position:absolute;top:26px;bottom:34px;width:48px;left:0;z-index:3;border-radius:24px;pointer-events:none;opacity:0;
+.selfilm .scanbar{position:absolute;top:34px;bottom:38px;width:58px;left:0;z-index:3;border-radius:29px;pointer-events:none;opacity:0;
   background:linear-gradient(90deg,transparent,rgba(7,179,160,.42),transparent)}
 .dslide.active .selfilm .frame.on{animation:filmPick 6.5s ease-in-out infinite}
 .dslide.active .selfilm .frame.off{animation:filmDrop 6.5s ease-in-out infinite}
@@ -636,7 +636,7 @@ ul.feat li::before{content:"";position:absolute;left:0;top:.35em;width:16px;heig
 .callrow .c .cn{font-size:clamp(2rem,4vw,3rem);font-weight:850;letter-spacing:-.03em;line-height:1}
 .callrow .c .cl{font-size:.85rem;color:var(--muted);font-weight:600;margin-top:6px;max-width:20ch}
 /* horizontal SOTA timeline (evolución CNN -> híbrido -> atención) */
-.htl{position:relative;display:grid;grid-template-columns:repeat(5,1fr);margin:52px auto 0;max-width:1200px}
+.htl{position:relative;display:grid;grid-template-columns:repeat(6,1fr);margin:52px auto 0;max-width:1320px}
 .htl::before{content:"";position:absolute;left:9%;right:9%;top:8px;height:3px;border-radius:3px;
   background:linear-gradient(90deg,var(--resnet),var(--accent) 55%,var(--swin));opacity:.55}
 .hstep{position:relative;text-align:center;padding:0 12px}
@@ -825,7 +825,7 @@ ul.feat li::before{content:"";position:absolute;left:0;top:.35em;width:16px;heig
       <img class="etse" src="assets/etse_titulo.png" alt="ETSE · Escola Tècnica Superior d'Enginyeria">
     </div>
     <div class="kicker r d1">Detección de lesiones por imagen · Aprendizaje profundo</div>
-    <h1 class="kin r d1">Diagnóstico de rodilla<br>por <span class="grad">resonancia magnética</span></h1>
+    <h1 class="kin r d1">Diagnóstico de lesiones<br>de rodilla por<br><span class="grad">resonancia magnética</span></h1>
     <p class="big r d3">CNN frente a <i>transformers</i> para detectar la rotura del ligamento cruzado anterior.</p>
     <div class="byline r d4">
       <div><b>Pablo López Domínguez</b>Autor</div>
@@ -890,21 +890,6 @@ ul.feat li::before{content:"";position:absolute;left:0;top:.35em;width:16px;heig
       <div style="border-top:2px solid var(--accent3);padding-top:14px"><h3 style="font-size:1.08rem">Test intacto</h3><p style="color:var(--muted);font-size:.93rem;margin-top:7px">No se consulta en ninguna elección de arquitectura, hiperparámetro ni umbral: una única evaluación al final.</p></div>
     </div>
     <p class="note r d5">No es el test oculto de Stanford, pero sí uno <mark>separado y representativo</mark> (23% de prevalencia), sin tocarlo hasta el cierre del estudio.</p>
-  </div>
-</section>
-
-<!-- 3 QUESTION -->
-<section class="scene" id="objetivo" data-name="La pregunta">
-  <div class="blob c" style="left:8%"></div><div class="blob b"></div>
-  <div class="scene-inner" style="text-align:center">
-    <div class="kicker r" style="justify-content:center">La pregunta</div>
-    <p class="quote r d1 grad" style="margin:0 auto">¿Hace falta<br>un modelo grande?</p>
-    <p class="lead r d2" style="margin:26px auto 0;max-width:52ch">Tres familias arquitectónicas representativas, entrenadas bajo un mismo protocolo, a igualdad de condiciones.</p>
-    <div class="families r d3" style="text-align:left">
-      <div class="fam" style="--fc:var(--resnet)"><div class="ft">ResNet-50</div><div class="fs">CNN residual · sesgo de localidad e invarianza a la traslación</div><div class="fp">23.5 M<small>parámetros</small></div></div>
-      <div class="fam" style="--fc:var(--vit)"><div class="ft">ViT-Small</div><div class="fs">Transformer global · autoatención entre todos los parches</div><div class="fp">22 M<small>parámetros</small></div></div>
-      <div class="fam" style="--fc:var(--swin)"><div class="ft">Swin-Tiny</div><div class="fs">Transformer jerárquico · atención por ventanas desplazadas</div><div class="fp">27.8 M<small>parámetros</small></div></div>
-    </div>
   </div>
 </section>
 
@@ -1436,13 +1421,15 @@ ul.feat li::before{content:"";position:absolute;left:0;top:.35em;width:16px;heig
       <div class="hstep" style="--fc:var(--accent)"><div class="hdot"></div><div class="hy">2021</div><div class="hn">TransMed</div><div class="ha">0.981</div><div class="haucl">Híbrido CNN+ViT</div></div>
       <div class="hstep best" style="--fc:var(--accent)"><div class="hdot"></div><div class="hy">2022</div><div class="hn">MVANet</div><div class="ha">0.982</div><div class="haucl">Atención multivista</div></div>
       <div class="hstep" style="--fc:var(--swin)"><div class="hdot"></div><div class="hy">2023</div><div class="hn">SGNet</div><div class="ha">0.975</div><div class="haucl">CNN + atención</div></div>
+      <div class="hstep" style="--fc:var(--gold)"><div class="hdot"></div><div class="hy">Este TFG</div><div class="hn">Las 3 familias</div><div class="ha" style="color:var(--gold)">0.984</div><div class="haucl">ResNet · ViT · Swin · partición propia</div></div>
     </div>
     <div class="htl-legend r d4">
       <span><i style="background:var(--resnet)"></i>Redes convolucionales</span>
       <span><i style="background:var(--accent)"></i>Híbridos CNN + Transformer</span>
       <span><i style="background:var(--swin)"></i>Mecanismos de atención</span>
+      <span><i style="background:var(--gold)"></i>Este trabajo · 3 familias</span>
     </div>
-    <p class="note r d5" style="margin-top:26px">Los híbridos rozan 0.98, pero con más parámetros. Y casi todo se mide en <b style="color:var(--ink)">validación pública</b>, no en el test oculto: ¿es comparable? →</p>
+    <p class="note r d5" style="margin-top:26px">Las tres familias, bajo un mismo protocolo, alcanzan <b style="color:var(--gold)">0.984 en validación</b> —al nivel de los híbridos pero con <b style="color:var(--ink)">4× menos parámetros</b> (22–28 M)—; y en un <b style="color:var(--ink)">test reservado</b> más exigente se mantienen en ≈0.95. Aun así, casi todo el estado del arte mide en <b style="color:var(--ink)">validación pública</b>, no en test: ¿es comparable? →</p>
   </div>
 </section>
 
@@ -1563,6 +1550,26 @@ addEventListener('keydown',e=>{
   else if(e.key==='Home'){e.preventDefault();gotoScene(0,false);}
   else if(e.key==='End'){e.preventDefault();gotoScene(scenes.length-1,false);}
 });
+
+/* Navegación con ratón (sin pasador): clic izquierdo = siguiente, clic derecho = anterior.
+   Simula las flechas del teclado para reutilizar exactamente la misma lógica, incluidos
+   los pasos internos de los explicadores de arquitectura. Ignora enlaces, botones y
+   controles para que sigan funcionando, y respeta la selección de texto. */
+(function(){
+  const UI='a,button,input,textarea,select,iframe,label,.swctrl,.swbtn,.cbtn,.cdots,.dots,.prev,.next';
+  const isUI=t=>t&&t.closest&&t.closest(UI);
+  const key=k=>dispatchEvent(new KeyboardEvent('keydown',{key:k}));
+  document.addEventListener('click',e=>{
+    if(e.button!==0||isUI(e.target))return;
+    if(window.getSelection&&String(window.getSelection()))return;
+    key('ArrowRight');
+  });
+  document.addEventListener('contextmenu',e=>{
+    if(isUI(e.target))return;
+    e.preventDefault();
+    key('ArrowLeft');
+  });
+})();
 
 /* count-up for .count elements when their scene shows */
 function countUp(el){
