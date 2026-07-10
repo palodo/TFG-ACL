@@ -1571,13 +1571,12 @@ addEventListener('keydown',e=>{
   });
 })();
 
-/* Modo presentación: oculta el cursor tras inactividad (reaparece al moverlo) y
-   bloquea la rueda para que no salte de escena (navegación solo por clic/teclas). */
+/* Modo presentación: cursor siempre oculto (aunque se mueva sin querer) y rueda
+   bloqueada para que no salte de escena (navegación solo por clic/teclas). */
 (function(){
-  let t;
-  const show=()=>{document.body.style.cursor='';clearTimeout(t);t=setTimeout(()=>document.body.style.cursor='none',2500);};
-  document.addEventListener('mousemove',show,{passive:true});
-  show();
+  const s=document.createElement('style');
+  s.textContent='*{cursor:none!important}';
+  document.head.appendChild(s);
   window.addEventListener('wheel',e=>e.preventDefault(),{passive:false});
 })();
 
