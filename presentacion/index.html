@@ -1558,7 +1558,7 @@ addEventListener('keydown',e=>{
 (function(){
   const UI='a,button,input,textarea,select,iframe,label,.swctrl,.swbtn,.cbtn,.cdots,.dots,.prev,.next';
   const isUI=t=>t&&t.closest&&t.closest(UI);
-  const key=k=>dispatchEvent(new KeyboardEvent('keydown',{key:k}));
+  const key=k=>document.body.dispatchEvent(new KeyboardEvent('keydown',{key:k,bubbles:true,cancelable:true}));
   document.addEventListener('click',e=>{
     if(e.button!==0||isUI(e.target))return;
     if(window.getSelection&&String(window.getSelection()))return;
